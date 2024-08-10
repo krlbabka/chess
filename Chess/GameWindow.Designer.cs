@@ -1,6 +1,6 @@
 ﻿namespace Chess
 {
-    partial class Background
+    partial class GameWindow
     {
         /// <summary>
         ///  Required designer variable.

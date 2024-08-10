@@ -1,8 +1,8 @@
 namespace Chess
 {
-    public partial class Background : Form
+    public partial class GameWindow : Form
     {
-        public Background()
+        public GameWindow()
         {
             InitializeComponent();
         }
