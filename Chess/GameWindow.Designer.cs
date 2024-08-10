@@ -30,7 +30,7 @@
         {
             SuspendLayout();
             // 
-            // Background
+            // GameWindow
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -39,7 +39,7 @@
             ClientSize = new Size(1262, 673);
             ControlBox = false;
             ForeColor = Color.FromArgb(224, 222, 244);
-            Name = "Background";
+            Name = "GameWindow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Chess";
             ResumeLayout(false);
