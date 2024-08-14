@@ -5,12 +5,14 @@
         public Vector Position { get; set;}
         public bool IsOccupied { get; set; }
         public bool LegalMove { get; set; }
+        public Piece? OccupyingPiece { get; set; }
 
         public Tile(Vector position)
         {
-            this.Position = position;
+            Position = position;
             IsOccupied = false;
             LegalMove = false;
+            OccupyingPiece = null;
         }
     }
 }

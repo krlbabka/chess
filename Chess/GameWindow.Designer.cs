@@ -28,20 +28,16 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameWindow));
             SuspendLayout();
             // 
             // GameWindow
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(25, 23, 36);
-            BackgroundImageLayout = ImageLayout.None;
-            ClientSize = new Size(1262, 673);
-            ControlBox = false;
             ForeColor = Color.FromArgb(224, 222, 244);
             Name = "GameWindow";
-            StartPosition = FormStartPosition.CenterScreen;
-            Text = "Chess";
             ResumeLayout(false);
         }
 
