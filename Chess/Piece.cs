@@ -1,4 +1,5 @@
-﻿namespace Chess
+﻿
+namespace Chess
 {
     internal abstract class Piece
     {
@@ -35,6 +36,8 @@
             };
         }
 
+        internal abstract Image GetPieceImage(bool isWhite);
+
         public abstract Vector[] MoveVectors { get; }
     }
 
@@ -57,6 +60,12 @@
         public override Vector[] MoveVectors => moveVectors;
 
         public override char Notation => 'N';
+
+        internal override Image GetPieceImage(bool isWhite)
+        {
+            string source = "../../../Resources/" + (isWhite ? "w_knight.png" : "b_knight.png");
+            return Image.FromFile(source);
+        }
     }
 
     internal class Bishop : Piece
@@ -73,6 +82,12 @@
 
         public override Vector[] MoveVectors => moveVectors;
         public override char Notation => 'B';
+
+        internal override Image GetPieceImage(bool isWhite)
+        {
+            string source = "../../../Resources/" + (isWhite ? "w_bishop.png" : "b_bishop.png");
+            return Image.FromFile(source);
+        }
     }
 
     internal class Rook : Piece
@@ -89,6 +104,12 @@
 
         public override Vector[] MoveVectors => moveVectors;
         public override char Notation => 'R';
+
+        internal override Image GetPieceImage(bool isWhite)
+        {
+            string source = "../../../Resources/" + (isWhite ? "w_rook.png" : "b_rook.png");
+            return Image.FromFile(source);
+        }
     }
 
     internal class Queen : Piece
@@ -109,6 +130,12 @@
 
         public override Vector[] MoveVectors => moveVectors;
         public override char Notation => 'Q';
+
+        internal override Image GetPieceImage(bool isWhite)
+        {
+            string source = "../../../Resources/" + (isWhite ? "w_queen.png" : "b_queen.png");
+            return Image.FromFile(source);
+        }
     }
 
     internal class King : Piece
@@ -129,6 +156,12 @@
 
         public override Vector[] MoveVectors => moveVectors;
         public override char Notation => 'K';
+
+        internal override Image GetPieceImage(bool isWhite)
+        {
+            string source = "../../../Resources/" + (isWhite ? "w_king.png" : "b_king.png");
+            return Image.FromFile(source);
+        }
     }
 
     internal class Pawn : Piece
@@ -138,5 +171,11 @@
 
         public override Vector[] MoveVectors => [];
         public override char Notation => 'P';
+
+        internal override Image GetPieceImage(bool isWhite) 
+        {
+            string source = "../../../Resources/" + (isWhite ? "w_pawn.png" : "b_pawn.png");
+            return Image.FromFile(source);
+        }
     }
 }

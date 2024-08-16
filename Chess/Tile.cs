@@ -21,5 +21,6 @@ namespace Chess
         {
             OccupyingPiece = CreatePiece(type, isWhite);
             IsOccupied = true;
-        }    }
+        }    
+    }
 }

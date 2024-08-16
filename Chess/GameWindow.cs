@@ -9,7 +9,7 @@ namespace Chess
             InitializeComponent();
         }
         PictureBox[,] pictureBox;
-        Button[,] chessPieces;
+        Button[,] boardButtons;
 
         private void GameWindow_Load(object sender, EventArgs e)
         {
@@ -36,9 +36,9 @@ namespace Chess
             {
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
-                    if (chessPieces[row, col] != null)
+                    if (boardButtons[row, col] != null)
                     {
-                        chessPieces[row, col].Click -= (sender, e) =>
+                        boardButtons[row, col].Click -= (sender, e) =>
                         {
                             Debug.WriteLine($"{row} {col}");
                         };
@@ -50,37 +50,49 @@ namespace Chess
 
         private void LoadChessboardBackground(Board board)
         {
-            pictureBox = new PictureBox[Board.BOARD_SIZE, Board.BOARD_SIZE];
-            chessPieces = new Button[Board.BOARD_SIZE, Board.BOARD_SIZE];
+            boardButtons = new Button[Board.BOARD_SIZE, Board.BOARD_SIZE];
             for (int row = 0; row < Board.BOARD_SIZE; row++)
             {
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
                     int rowVar = row; 
                     int colVar = col;
-                    pictureBox[rowVar, colVar] = new PictureBox
+                    boardButtons[rowVar, colVar] = new Button
                     {
                         BackColor = (rowVar + colVar) % 2 == 0 ? Color.White : Color.Black,
                         Dock = DockStyle.Fill,
+                        FlatStyle = FlatStyle.Flat,
+                        FlatAppearance = { BorderSize = 0 },
                         Margin = new Padding(0)
                     };
-                    GamePanel.Controls.Add(pictureBox[rowVar, colVar], colVar, rowVar);
 
-                    if (board.TileOccupied(new Vector(rowVar, colVar)))
+                    if (board.IsTileOccupied(new Vector(rowVar, colVar)))
                     {
-                        chessPieces[rowVar, colVar] = new Button
-                        {
-                            BackColor = Color.Red,
-                            Dock = DockStyle.Bottom
-                        };
-                        chessPieces[rowVar, colVar].Click += (sender, e) =>
+                        boardButtons[rowVar, colVar].Enabled = true;
+                        boardButtons[rowVar, colVar].Click += (sender, e) =>
                         {
                             Debug.WriteLine($"{rowVar} {colVar}");
                         };
-                        pictureBox[rowVar, colVar].Controls.Add(chessPieces[rowVar, colVar]);
+                        Piece? piece = board.GetPieceAtPosition(new Vector(rowVar, colVar));
+                        SetPieceImage(boardButtons[rowVar, colVar], piece.GetPieceImage(piece.IsWhite));
+                        
                     }
+                    else
+                    {
+                        boardButtons[rowVar, colVar].Enabled = false;
+                    }
+                    GamePanel.Controls.Add(boardButtons[rowVar, colVar], colVar, rowVar);
                 }
             }
         }
+
+        private void SetPieceImage(Button button, Image pieceImage)
+        {
+            button.Image = pieceImage;
+            button.ImageAlign = ContentAlignment.MiddleCenter;
+        }
+
+
+
     }
 }

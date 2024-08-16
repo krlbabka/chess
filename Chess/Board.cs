@@ -42,10 +42,9 @@ namespace Chess
             }
         }
 
-        public bool TileOccupied(Vector position)
-        {
-            return BoardGrid[position.X, position.Y].IsOccupied;
-        }
+        public Piece? GetPieceAtPosition(Vector position) => BoardGrid[position.X, position.Y].OccupyingPiece;
+        public bool IsTileOccupied(Vector position) => BoardGrid[position.X, position.Y].IsOccupied;
+        
         private void FindLegalTiles(Tile CurrentTile, Piece ChessPiece)
         {
             foreach (Tile tile in BoardGrid)
@@ -133,13 +132,17 @@ namespace Chess
             return possibleMoves;
         }
 
-        private void MovePiece(Tile CurrentTile, Tile NewTile)
+        internal void MovePiece(Vector Current, Vector New)
         {
-            NewTile.IsOccupied = true;
-            NewTile.OccupyingPiece = CurrentTile.OccupyingPiece;
-            CurrentTile.IsOccupied = false;
-            CurrentTile.OccupyingPiece = null;
-            //TODO: add taken piece to a list of taken pieces and add the value of taken piece to the player
+            var CurrentTile = BoardGrid[Current.X, Current.Y];
+            var NewTile = BoardGrid[New.X, New.Y];
+
+            if (CurrentTile.OccupyingPiece != null)
+            {
+                NewTile.AddPieceToTile(CurrentTile.OccupyingPiece.Type, CurrentTile.OccupyingPiece.IsWhite);
+                CurrentTile.IsOccupied = false;
+                CurrentTile.OccupyingPiece = null;
+            }
         }
 
         public void printBoard()
@@ -160,6 +163,12 @@ namespace Chess
                 }
                 Debug.Write("\n");
             }
+        }
+
+        internal bool IsKingUnderAttack(bool isKingWhite)
+        {
+            //TODO: Implement
+            throw new NotImplementedException();
         }
     }
 }
