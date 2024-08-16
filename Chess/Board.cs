@@ -4,7 +4,7 @@ namespace Chess
 {
     internal class Board
     {
-        const int BOARD_SIZE = 8;
+        public const int BOARD_SIZE = 8;
 
         public Tile[,] BoardGrid;
 
@@ -21,6 +21,31 @@ namespace Chess
             }
         }
 
+        internal void defaultPosition()
+        {
+            Piece.PieceType[] BackRankPieces = { 
+                Piece.PieceType.Rook, 
+                Piece.PieceType.Knight, 
+                Piece.PieceType.Bishop, 
+                Piece.PieceType.Queen, 
+                Piece.PieceType.King,
+                Piece.PieceType.Bishop, 
+                Piece.PieceType.Knight, 
+                Piece.PieceType.Rook 
+            };
+            for (int col = 0; col < BOARD_SIZE; col++)
+            {
+                BoardGrid[0, col].AddPieceToTile(BackRankPieces[col], false);
+                BoardGrid[1, col].AddPieceToTile(Piece.PieceType.Pawn, false);
+                BoardGrid[6, col].AddPieceToTile(Piece.PieceType.Pawn, true);
+                BoardGrid[7, col].AddPieceToTile(BackRankPieces[col], true);
+            }
+        }
+
+        public bool TileOccupied(Vector position)
+        {
+            return BoardGrid[position.X, position.Y].IsOccupied;
+        }
         private void FindLegalTiles(Tile CurrentTile, Piece ChessPiece)
         {
             foreach (Tile tile in BoardGrid)
@@ -119,27 +144,18 @@ namespace Chess
 
         public void printBoard()
         {
-            // For debugging only
-            FindLegalTiles(BoardGrid[3, 3], BoardGrid[3, 3].OccupyingPiece);
             for (int row = 0; row < BOARD_SIZE; row++)
             {
                 for (int col = 0; col < BOARD_SIZE; col++)
                 {
                     if (BoardGrid[row, col].IsOccupied)
                     {
-                        Debug.Write($" {BoardGrid[row, col].OccupyingPiece.ToString()[6]} ");
-                        if (BoardGrid[row, col].LegalMove == true)
-                        {
-                            Debug.Write(" * ");
-                        }
-                    }
-                    else if (BoardGrid[row, col].LegalMove == true)
-                    {
-                        Debug.Write(" * ");
+                        char pieceColor = BoardGrid[row, col].OccupyingPiece.IsWhite ? 'W' : 'B';
+                        Debug.Write($" {pieceColor}{BoardGrid[row, col].OccupyingPiece.Notation} ");
                     }
                     else
                     {
-                        Debug.Write(" - ");
+                        Debug.Write(" -- ");
                     }
                 }
                 Debug.Write("\n");

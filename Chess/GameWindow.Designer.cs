@@ -29,18 +29,39 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameWindow));
+            GamePanel = new TableLayoutPanel();
+            ParentGamePanel = new Panel();
+            ParentGamePanel.SuspendLayout();
             SuspendLayout();
+            // 
+            // GamePanel
+            // 
+            resources.ApplyResources(GamePanel, "GamePanel");
+            GamePanel.BackColor = Color.FromArgb(144, 140, 170);
+            GamePanel.Name = "GamePanel";
+            // 
+            // ParentGamePanel
+            // 
+            resources.ApplyResources(ParentGamePanel, "ParentGamePanel");
+            ParentGamePanel.Controls.Add(GamePanel);
+            ParentGamePanel.Name = "ParentGamePanel";
             // 
             // GameWindow
             // 
             resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(25, 23, 36);
+            Controls.Add(ParentGamePanel);
             ForeColor = Color.FromArgb(224, 222, 244);
             Name = "GameWindow";
+            Load += GameWindow_Load;
+            ParentGamePanel.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
+
+        private TableLayoutPanel GamePanel;
+        private Panel ParentGamePanel;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Chess
+﻿using static Chess.Piece;
+
+namespace Chess
 {
     internal class Tile
     {
@@ -14,5 +16,10 @@
             LegalMove = false;
             OccupyingPiece = null;
         }
-    }
+
+        internal void AddPieceToTile(PieceType type, bool isWhite)
+        {
+            OccupyingPiece = CreatePiece(type, isWhite);
+            IsOccupied = true;
+        }    }
 }
