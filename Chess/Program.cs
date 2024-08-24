@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Chess
 {
     internal static class Program

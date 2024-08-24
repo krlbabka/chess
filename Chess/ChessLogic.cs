@@ -2,7 +2,7 @@
 namespace Chess
 {
 
-    public class Vector 
+    public class Vector
     {
         public int X { get; set; }
         public int Y { get; set; }
@@ -10,6 +10,11 @@ namespace Chess
         {
             X = x;
             Y = y;
+        }
+
+        public bool IsEqual(Vector Other)
+        {
+            return X == Other.X && Y == Other.Y;
         }
     }
 
@@ -32,6 +37,7 @@ namespace Chess
 
             if (board.IsTileOccupied(to) && board.GetPieceAtPosition(to)?.IsWhite == isWhiteTurn) return false;
 
+            //TODO: implement
             return true;
         }
 
@@ -44,12 +50,11 @@ namespace Chess
             if (CanMove(from, to))
             {
                 board.MovePiece(from, to);
-                SwitchTurn();
             }
         }
 
-        private bool IsWhiteTurn() => isWhiteTurn;
-        private void SwitchTurn() => isWhiteTurn = !isWhiteTurn;
+        internal bool IsWhiteTurn() => isWhiteTurn;
+        internal void SwitchTurn() => isWhiteTurn = !isWhiteTurn;
 
         private bool IsCheck()
         {

@@ -33,6 +33,7 @@ namespace Chess
                 PieceType.Queen => new Queen(isWhite),
                 PieceType.King => new King(isWhite),
                 PieceType.Pawn => new Pawn(isWhite),
+                _ => throw new NotImplementedException()
             };
         }
 
@@ -166,7 +167,9 @@ namespace Chess
 
     internal class Pawn : Piece
     {
-        //TODO Add pawn vectors and logic
+        internal readonly Vector[] moveVectors = {
+            new Vector(-1, 0)
+        };
         public Pawn(bool isWhite) : base(PieceType.Pawn, isWhite) { }
 
         public override Vector[] MoveVectors => [];

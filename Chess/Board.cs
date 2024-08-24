@@ -44,14 +44,18 @@ namespace Chess
 
         public Piece? GetPieceAtPosition(Vector position) => BoardGrid[position.X, position.Y].OccupyingPiece;
         public bool IsTileOccupied(Vector position) => BoardGrid[position.X, position.Y].IsOccupied;
-        
-        private void FindLegalTiles(Tile CurrentTile, Piece ChessPiece)
+
+        internal void ResetLegalTiles()
         {
             foreach (Tile tile in BoardGrid)
             {
                 tile.LegalMove = false;
             }
-            Debug.WriteLine($"Current tile: {CurrentTile.Position.X} - {CurrentTile.Position.Y}");
+        }
+
+        internal void FindLegalTiles(Tile CurrentTile, Piece ChessPiece)
+        {
+            ResetLegalTiles();
 
             var possibleMoves = GetPossibleMoves(ChessPiece, CurrentTile.Position);
 
@@ -60,13 +64,13 @@ namespace Chess
                 if (tileVector.X >= 0 && tileVector.Y >= 0 && tileVector.X < BOARD_SIZE && tileVector.Y < BOARD_SIZE)
                 {
                     bool isOccupied = BoardGrid[tileVector.X, tileVector.Y].IsOccupied;
+                    bool isEnemy = false;
                     if (isOccupied)
                     {
-                        bool isEnemy = isOccupied && BoardGrid[tileVector.X, tileVector.Y].OccupyingPiece.IsWhite != ChessPiece.IsWhite;
+                        isEnemy = BoardGrid[tileVector.X, tileVector.Y].OccupyingPiece.IsWhite != ChessPiece.IsWhite;
                     }
-                    if (BoardGrid[tileVector.X, tileVector.Y].IsOccupied || tileVector.X < 0 || tileVector.X >= BOARD_SIZE || tileVector.Y < 0 || tileVector.Y >= BOARD_SIZE)
+                    if (!isEnemy && BoardGrid[tileVector.X, tileVector.Y].IsOccupied || tileVector.X < 0 || tileVector.X >= BOARD_SIZE || tileVector.Y < 0 || tileVector.Y >= BOARD_SIZE)
                     {
-                        Debug.WriteLine($"Tile {tileVector.X} - {tileVector.Y} is occupied or out of bounds");
                         continue;
                     }
                     BoardGrid[tileVector.X, tileVector.Y].LegalMove = true;
@@ -107,7 +111,6 @@ namespace Chess
                             {
                                 PATH_FREE = false;
                             }
-                            //TODO: Check if the conditions are correct via debug later
                         }
                         else
                         {
@@ -118,7 +121,9 @@ namespace Chess
                 }
                 else if (piece.Type == Piece.PieceType.Pawn)
                 {
-                    //TODO: Add pawn logic and checks
+                    var newX = currentPosition.X + vector.X;
+                    var newY = currentPosition.Y + vector.Y;
+                    possibleMoves.Add(new Vector(newX, newY));
                 }
                 else
                 {
