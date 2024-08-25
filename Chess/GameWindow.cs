@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Drawing;
 
 namespace Chess
 {
@@ -14,11 +13,11 @@ namespace Chess
 
         public GameWindow()
         {
-            InitializeComponent();
             board = new Board();
+            chessLogic = new ChessLogic(board);
+            InitializeComponent();
             board.defaultPosition();
             SetupChessboard(board);
-            chessLogic = new ChessLogic(board);
         }
 
         private void GameWindow_Load(object sender, EventArgs e)
@@ -174,6 +173,14 @@ namespace Chess
                     }
                 }
             }
+            if (board.IsKingUnderAttack(chessLogic.IsWhiteTurn()))
+            {
+                Vector kingPosition = board.FindKingPosition(chessLogic.IsWhiteTurn());
+                Button button = boardButtons[kingPosition.X, kingPosition.Y];
+                button.BackColor = Color.Red;
+                button.FlatAppearance.MouseDownBackColor = Color.Red;
+                button.FlatAppearance.MouseOverBackColor = Color.Red;
+            }
         }
 
         private void updateActions() 
@@ -205,9 +212,16 @@ namespace Chess
 
         private void MovePiece(Vector Current, Vector New)
         {
-            board.MovePiece(Current, New);
-            LastMove = New;
-            SwitchTurn();
+            if (chessLogic.CanMove(Current, New))
+            {
+                chessLogic.MovePiece(board, Current, New);
+                LastMove = New;
+                if (chessLogic.IsMate())
+                {
+                    SetupChessboard(board);
+                }
+                SwitchTurn();
+            }
             UpdateChessboard();
             updateGUI();
             updateActions();

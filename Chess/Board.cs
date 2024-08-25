@@ -1,4 +1,6 @@
-﻿namespace Chess
+﻿using System.Diagnostics;
+
+namespace Chess
 {
     internal class Board
     {
@@ -9,7 +11,7 @@
         public Board()
         {
             BoardGrid = new Tile[BOARD_SIZE, BOARD_SIZE];
-        
+
             for (int row = 0; row < BOARD_SIZE; row++)
             {
                 for (int col = 0; col < BOARD_SIZE; col++)
@@ -17,6 +19,25 @@
                     BoardGrid[row, col] = new Tile(new Vector(row, col));
                 }
             }
+        }
+
+        public int GetBoardSize() => BOARD_SIZE;
+
+        public Tile[,] getBoardCopy()
+        {
+            Tile[,] copy = new Tile[BOARD_SIZE, BOARD_SIZE];
+            for (int row = 0; row < BOARD_SIZE; row++)
+            {
+                for (int col = 0; col < BOARD_SIZE; col++)
+                {
+                    copy[row, col] = new Tile(new Vector(row, col));
+                    if (BoardGrid[row, col].IsOccupied)
+                    {
+                        copy[row, col].AddPieceToTile(BoardGrid[row, col].OccupyingPiece.Type, BoardGrid[row, col].OccupyingPiece.IsWhite);
+                    }
+                }
+            }
+            return copy;
         }
 
         internal void defaultPosition()
@@ -76,7 +97,7 @@
             }
         }
 
-        private List<Vector> GetPossibleMoves(Piece piece, Vector currentPosition)
+        internal List<Vector> GetPossibleMoves(Piece piece, Vector currentPosition)
         {
             var possibleMoves = new List<Vector>();
             var multiSquarePieces = new[] { Piece.PieceType.Bishop, Piece.PieceType.Rook, Piece.PieceType.Queen };
@@ -151,34 +172,65 @@
                     // For King / Knight
                     var newX = currentPosition.X + vector.X;
                     var newY = currentPosition.Y + vector.Y;
-                    possibleMoves.Add(new Vector(newX, newY));
+                    Vector newPosition = new Vector(newX, newY);
+                    if (WithinBounds(newPosition))
+                    {
+                        if (BoardGrid[newPosition.X, newPosition.Y].IsOccupied)
+                        {
+                            if (CheckEnemy(currentPosition, newPosition))
+                            {
+                                possibleMoves.Add(new Vector(newX, newY));
+                            }
+                        }
+                        else
+                        {
+                            possibleMoves.Add(new Vector(newX, newY));
+                        }
+                    }
                 }
             }
             return possibleMoves;
         }
 
-        internal void MovePiece(Vector Current, Vector New)
-        {
-            var CurrentTile = BoardGrid[Current.X, Current.Y];
-            var NewTile = BoardGrid[New.X, New.Y];
-
-            if (CurrentTile.OccupyingPiece != null)
-            {
-                if (CurrentTile.OccupyingPiece.Type == Piece.PieceType.Pawn)
-                {
-                    CurrentTile.OccupyingPiece.PawnMoved();
-                }
-                NewTile.OccupyingPiece = CurrentTile.OccupyingPiece;
-                NewTile.IsOccupied = true;
-                CurrentTile.IsOccupied = false;
-                CurrentTile.OccupyingPiece = null;
-            }
-        }
-
         internal bool IsKingUnderAttack(bool isKingWhite)
         {
-            //TODO: Implement
-            throw new NotImplementedException();
+            Vector kingPosition = FindKingPosition(isKingWhite);
+            for (int row = 0; row < BOARD_SIZE; row++)
+            {
+                for (int col = 0; col < BOARD_SIZE; col++)
+                {
+                    if (BoardGrid[row, col].IsOccupied && BoardGrid[row, col].OccupyingPiece.IsWhite != isKingWhite)
+                    {
+                        Piece piece = BoardGrid[row, col].OccupyingPiece;
+                        List<Vector> possibleMoves = GetPossibleMoves(piece, new Vector(row, col));
+
+                        foreach (var vector in possibleMoves)
+                        {
+                            if (vector.IsEqual(kingPosition))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        internal Vector FindKingPosition(bool isKingWhite)
+        {
+            Vector kingPosition = isKingWhite ? new Vector(0, 4) : new Vector(7, 4);
+            for (int row = 0; row < BOARD_SIZE; row++)
+            {
+                for (int col = 0; col < BOARD_SIZE; col++)
+                {
+                    if (BoardGrid[row, col].IsOccupied && BoardGrid[row, col].OccupyingPiece.Type == Piece.PieceType.King && BoardGrid[row, col].OccupyingPiece.IsWhite == isKingWhite)
+                    {
+                        kingPosition = new Vector(row, col);
+                    }
+                }
+            }
+            return kingPosition;
         }
 
         private bool WithinBounds(Vector position)
