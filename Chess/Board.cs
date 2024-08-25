@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Chess
+﻿namespace Chess
 {
     internal class Board
     {
@@ -57,7 +55,7 @@ namespace Chess
         {
             ResetLegalTiles();
 
-            var possibleMoves = GetPossibleMoves(ChessPiece, CurrentTile.Position);
+            List<Vector>? possibleMoves = GetPossibleMoves(ChessPiece, CurrentTile.Position);
 
             foreach (var tileVector in possibleMoves)
             {
@@ -82,9 +80,8 @@ namespace Chess
         {
             var possibleMoves = new List<Vector>();
             var multiSquarePieces = new[] { Piece.PieceType.Bishop, Piece.PieceType.Rook, Piece.PieceType.Queen };
-            Debug.WriteLine($"Current piece: {piece.Type}");
 
-            foreach (var vector in piece.MoveVectors)
+            foreach (Vector vector in piece.MoveVectors)
             {
                 if (multiSquarePieces.Contains(piece.Type))
                 {
@@ -95,16 +92,17 @@ namespace Chess
                     {
                         var newX = currentPosition.X + vector.X * distance;
                         var newY = currentPosition.Y + vector.Y * distance;
+                        Vector newPosition = new Vector(newX, newY);
 
-                        if (newX < 0 || newX >= BOARD_SIZE || newY < 0 || newY >= BOARD_SIZE)
+                        if (!WithinBounds(newPosition))
                         {
                             PATH_FREE = false;
                         }
                         else if (BoardGrid[newX, newY].IsOccupied)
                         {
-                            if (BoardGrid[currentPosition.X, currentPosition.Y].OccupyingPiece.IsWhite != BoardGrid[newX, newY].OccupyingPiece.IsWhite)
+                            if (CheckEnemy(currentPosition, newPosition))
                             {
-                                possibleMoves.Add(new Vector(newX, newY));
+                                possibleMoves.Add(newPosition);
                                 PATH_FREE = false;
                             }
                             else
@@ -114,16 +112,39 @@ namespace Chess
                         }
                         else
                         {
-                            possibleMoves.Add(new Vector(newX, newY));
+                            possibleMoves.Add(newPosition);
                         }
                         distance++;
                     }
                 }
                 else if (piece.Type == Piece.PieceType.Pawn)
                 {
-                    var newX = currentPosition.X + vector.X;
-                    var newY = currentPosition.Y + vector.Y;
-                    possibleMoves.Add(new Vector(newX, newY));
+                    // Weird pawn logic
+
+                    List<Vector> MoveVectors = [vector];
+                    Vector[] takeVectors = { new Vector(vector.X, -1), new Vector(vector.X, 1) };
+
+                    if (!piece.HasMoved())
+                    {
+                        MoveVectors.Add(new Vector(vector.X * 2, 0));
+                    }
+                    Vector[] enPassantCheck = { new Vector(0, -1), new Vector(0, 1) };
+                    foreach (Vector moveVector in MoveVectors)
+                    {
+                        Vector movePosition = currentPosition + moveVector;
+                        if (WithinBounds(movePosition) && !BoardGrid[movePosition.X, movePosition.Y].IsOccupied)
+                        {
+                            possibleMoves.Add(movePosition);
+                        }
+                    }
+                    foreach (Vector takeVector in takeVectors)
+                    {
+                        Vector takePosition = currentPosition + takeVector;
+                        if (WithinBounds(takePosition) && BoardGrid[takePosition.X, takePosition.Y].IsOccupied && CheckEnemy(currentPosition, takePosition))
+                        {
+                            possibleMoves.Add(takePosition);
+                        }
+                    }
                 }
                 else
                 {
@@ -131,7 +152,6 @@ namespace Chess
                     var newX = currentPosition.X + vector.X;
                     var newY = currentPosition.Y + vector.Y;
                     possibleMoves.Add(new Vector(newX, newY));
-                    Debug.WriteLine($"Added vector: {newX} - {newY}");
                 }
             }
             return possibleMoves;
@@ -144,29 +164,14 @@ namespace Chess
 
             if (CurrentTile.OccupyingPiece != null)
             {
-                NewTile.AddPieceToTile(CurrentTile.OccupyingPiece.Type, CurrentTile.OccupyingPiece.IsWhite);
+                if (CurrentTile.OccupyingPiece.Type == Piece.PieceType.Pawn)
+                {
+                    CurrentTile.OccupyingPiece.PawnMoved();
+                }
+                NewTile.OccupyingPiece = CurrentTile.OccupyingPiece;
+                NewTile.IsOccupied = true;
                 CurrentTile.IsOccupied = false;
                 CurrentTile.OccupyingPiece = null;
-            }
-        }
-
-        public void printBoard()
-        {
-            for (int row = 0; row < BOARD_SIZE; row++)
-            {
-                for (int col = 0; col < BOARD_SIZE; col++)
-                {
-                    if (BoardGrid[row, col].IsOccupied)
-                    {
-                        char pieceColor = BoardGrid[row, col].OccupyingPiece.IsWhite ? 'W' : 'B';
-                        Debug.Write($" {pieceColor}{BoardGrid[row, col].OccupyingPiece.Notation} ");
-                    }
-                    else
-                    {
-                        Debug.Write(" -- ");
-                    }
-                }
-                Debug.Write("\n");
             }
         }
 
@@ -174,6 +179,16 @@ namespace Chess
         {
             //TODO: Implement
             throw new NotImplementedException();
+        }
+
+        private bool WithinBounds(Vector position)
+        {
+            return position.X >= 0 && position.X < BOARD_SIZE && position.Y >= 0 && position.Y < BOARD_SIZE;
+        }
+
+        private bool CheckEnemy(Vector myPosition, Vector newPosition) 
+        {
+            return BoardGrid[myPosition.X, myPosition.Y].OccupyingPiece.IsWhite != BoardGrid[newPosition.X, newPosition.Y].OccupyingPiece.IsWhite;
         }
     }
 }

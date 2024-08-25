@@ -38,8 +38,9 @@ namespace Chess
         }
 
         internal abstract Image GetPieceImage(bool isWhite);
-
         public abstract Vector[] MoveVectors { get; }
+        public virtual bool HasMoved() { return false; }
+        public virtual bool PawnMoved() { return false; }
     }
 
     internal class Knight : Piece 
@@ -167,12 +168,18 @@ namespace Chess
 
     internal class Pawn : Piece
     {
-        internal readonly Vector[] moveVectors = {
-            new Vector(-1, 0)
-        };
-        public Pawn(bool isWhite) : base(PieceType.Pawn, isWhite) { }
+        private readonly Vector[] moveVectors;
+        private bool Moved;
 
-        public override Vector[] MoveVectors => [];
+        public Pawn(bool isWhite) : base(PieceType.Pawn, isWhite)
+        {
+            Moved = false;
+            moveVectors = isWhite ? [new Vector(-1, 0)] : [new Vector(1, 0)];
+        }
+
+        public override Vector[] MoveVectors => moveVectors;
+        public override bool HasMoved() => Moved;
+        public override bool PawnMoved() => Moved = true;
         public override char Notation => 'P';
 
         internal override Image GetPieceImage(bool isWhite) 

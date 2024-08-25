@@ -62,14 +62,13 @@ namespace Chess
                 {
                     int rowVar = row;
                     int colVar = col;
+                    Color tileColor = (rowVar + colVar) % 2 == 0 ? Color.White : Color.Black;
                     boardButtons[rowVar, colVar] = new Button
                     {
-                        BackColor = (rowVar + colVar) % 2 == 0 ? Color.White : Color.Black,
+                        BackColor = tileColor,
                         Dock = DockStyle.Fill,
                         FlatStyle = FlatStyle.Flat,
-                        FlatAppearance = {  BorderSize = 0,
-                                            MouseDownBackColor = (rowVar + colVar) % 2 == 0 ? Color.White : Color.Black,
-                                            MouseOverBackColor = (rowVar + colVar) % 2 == 0 ? Color.White : Color.Black},
+                        FlatAppearance = {  BorderSize = 0, MouseDownBackColor = tileColor, MouseOverBackColor = tileColor},
                         Margin = new Padding(0),
                     };
                 }
@@ -169,7 +168,9 @@ namespace Chess
                     }
                     if (LastMove != null && position.IsEqual(LastMove))
                     {
-                        button.BackColor = Color.Yellow;
+                        button.BackColor = Color.BlueViolet;
+                        button.FlatAppearance.MouseDownBackColor = Color.BlueViolet;
+                        button.FlatAppearance.MouseOverBackColor = Color.BlueViolet;
                     }
                 }
             }

@@ -12,6 +12,16 @@ namespace Chess
             Y = y;
         }
 
+        public static Vector operator +(Vector first, Vector second)
+        {
+            return new Vector(first.X + second.X, first.Y + second.Y);
+        }
+
+        public static Vector operator -(Vector first, Vector second)
+        {
+            return new Vector(first.X - second.X, first.Y - second.Y);
+        }
+
         public bool IsEqual(Vector Other)
         {
             return X == Other.X && Y == Other.Y;
@@ -26,31 +36,6 @@ namespace Chess
         {
             this.board = board;
             isWhiteTurn = true;
-        }
-
-        private bool CanMove(Vector from, Vector to) 
-        {
-            Piece? piece = board.GetPieceAtPosition(from);
-            if (piece == null) return false;
-
-            if (piece.IsWhite != isWhiteTurn) return false;
-
-            if (board.IsTileOccupied(to) && board.GetPieceAtPosition(to)?.IsWhite == isWhiteTurn) return false;
-
-            //TODO: implement
-            return true;
-        }
-
-        public void MovePiece(Vector from, Vector to)
-        {
-            Piece? piece = board.GetPieceAtPosition(from);
-            if (piece == null || piece.IsWhite != isWhiteTurn)
-                return;
-
-            if (CanMove(from, to))
-            {
-                board.MovePiece(from, to);
-            }
         }
 
         internal bool IsWhiteTurn() => isWhiteTurn;
