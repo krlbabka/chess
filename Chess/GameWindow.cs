@@ -22,7 +22,7 @@ namespace Chess
 
         private void GameWindow_Load(object sender, EventArgs e)
         {
-            this.Size = new Size(920, 720);
+            Size = new Size(920, 720);
             ParentGamePanel.Controls.Add(GamePanel);
             ParentGamePanel.Dock = DockStyle.None;
             ParentGamePanel.Top = 35;
@@ -31,7 +31,7 @@ namespace Chess
             GamePanel.Dock = DockStyle.Fill;
             UpdateChessboard();
 
-            this.FormClosing += (sender, e) => GameWindow_Closing();
+            FormClosing += (sender, e) => GameWindow_Closing();
         }
 
         private void GameWindow_Closing()
@@ -87,7 +87,7 @@ namespace Chess
                     button.Click -= Button_Click;
                     if (board.IsTileOccupied(position))
                     {
-                        if (board.BoardGrid[position.X, position.Y].OccupyingPiece!.IsWhite == chessLogic.IsWhiteTurn())
+                        if (board.GetPieceAtPosition(position)!.IsWhite == chessLogic.IsWhiteTurn())
                         {
                             button.Click += Button_Click;
                         }
@@ -111,7 +111,7 @@ namespace Chess
             int rowVar = GamePanel.GetRow(button);
             int colVar = GamePanel.GetColumn(button);
             ClickedPosition = new Vector(rowVar, colVar);
-            board.FindLegalTiles(board.BoardGrid[rowVar, colVar], board.BoardGrid[rowVar, colVar].OccupyingPiece);
+            board.FindLegalTiles(board.BoardGrid[rowVar, colVar], board.GetPieceAtPosition(ClickedPosition));
             updateGUI();
             updateActions();
         }
@@ -155,21 +155,16 @@ namespace Chess
                     }
                     if (board.BoardGrid[position.X, position.Y].LegalMove)
                     {
-                        button.BackColor = Color.Green;
-                        button.FlatAppearance.MouseDownBackColor = Color.Green;
-                        button.FlatAppearance.MouseOverBackColor = Color.Green;
+                        SetButtonColor(button, Color.Green);
                     }
                     else
                     {
-                        button.BackColor = (position.X + position.Y) % 2 == 0 ? Color.White : Color.Black;
-                        button.FlatAppearance.MouseDownBackColor = (position.X + position.Y) % 2 == 0 ? Color.White : Color.Black;
-                        button.FlatAppearance.MouseOverBackColor = (position.X + position.Y) % 2 == 0 ? Color.White : Color.Black;
+                        Color btnColor = (position.X + position.Y) % 2 == 0 ? Color.White : Color.Black;
+                        SetButtonColor(button, btnColor);
                     }
                     if (LastMove != null && position.IsEqual(LastMove))
                     {
-                        button.BackColor = Color.BlueViolet;
-                        button.FlatAppearance.MouseDownBackColor = Color.BlueViolet;
-                        button.FlatAppearance.MouseOverBackColor = Color.BlueViolet;
+                        SetButtonColor(button, Color.BlueViolet);
                     }
                 }
             }
@@ -177,9 +172,7 @@ namespace Chess
             {
                 Vector kingPosition = board.FindKingPosition(chessLogic.IsWhiteTurn());
                 Button button = boardButtons[kingPosition.X, kingPosition.Y];
-                button.BackColor = Color.Red;
-                button.FlatAppearance.MouseDownBackColor = Color.Red;
-                button.FlatAppearance.MouseOverBackColor = Color.Red;
+                SetButtonColor(button, Color.Red);
             }
         }
 
@@ -218,19 +211,42 @@ namespace Chess
                 LastMove = New;
                 if (chessLogic.IsMate())
                 {
-                    SetupChessboard(board);
+                    GameOver("Mate");
+                    return;
+                }
+                if (chessLogic.IsDraw())
+                {
+                    GameOver($"Draw");
+                    return;
                 }
                 SwitchTurn();
             }
             UpdateChessboard();
             updateGUI();
             updateActions();
+            if (chessLogic.IsStalemate())
+            {
+                GameOver("Stalemate");
+                return;
+            }
         }
 
         private void SetPieceImage(Button button, Image pieceImage)
         {
             button.Image = pieceImage;
             button.ImageAlign = ContentAlignment.MiddleCenter;
+        }
+
+        private void SetButtonColor(Button b, Color color)
+        {
+            b.BackColor = color;
+            b.FlatAppearance.MouseDownBackColor = color;
+            b.FlatAppearance.MouseOverBackColor = color;
+        }
+
+        private void GameOver(string message) 
+        {
+            MessageBox.Show(message);
         }
     }
 }

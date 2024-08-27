@@ -1,21 +1,22 @@
 ﻿
 namespace Chess
 {
+    internal enum PieceType
+    {
+        Pawn,
+        Rook,
+        Knight,
+        Bishop,
+        Queen,
+        King
+    }
+
     internal abstract class Piece
     {
-        internal enum PieceType
-        {
-            Pawn,
-            Rook,
-            Knight,
-            Bishop,
-            Queen,
-            King
-        }
-
         public PieceType Type { get; set; }
         public bool IsWhite { get; set; }
         public abstract char Notation { get; }
+        public virtual int MaterialValue { get; }
 
         public Piece(PieceType type, bool isWhite)
         {
@@ -40,7 +41,7 @@ namespace Chess
         internal abstract Image GetPieceImage(bool isWhite);
         public abstract Vector[] MoveVectors { get; }
         public virtual bool HasMoved() { return false; }
-        public virtual bool PawnMoved() { return false; }
+        public virtual bool PieceMoved() { return false; }
     }
 
     internal class Knight : Piece 
@@ -62,6 +63,7 @@ namespace Chess
         public override Vector[] MoveVectors => moveVectors;
 
         public override char Notation => 'N';
+        public override int MaterialValue => 3;
 
         internal override Image GetPieceImage(bool isWhite)
         {
@@ -84,6 +86,7 @@ namespace Chess
 
         public override Vector[] MoveVectors => moveVectors;
         public override char Notation => 'B';
+        public override int MaterialValue => 3;
 
         internal override Image GetPieceImage(bool isWhite)
         {
@@ -101,11 +104,18 @@ namespace Chess
             new Vector(-1, 0),
             new Vector(0, -1)
         };
+        private bool Moved;
 
-        public Rook(bool isWhite) : base(PieceType.Rook, isWhite) { }
+        public Rook(bool isWhite) : base(PieceType.Rook, isWhite)
+        {
+            Moved = false;
+        }
 
         public override Vector[] MoveVectors => moveVectors;
         public override char Notation => 'R';
+        public override int MaterialValue => 5;
+        public override bool HasMoved() => Moved;
+        public override bool PieceMoved() => Moved = true;
 
         internal override Image GetPieceImage(bool isWhite)
         {
@@ -132,6 +142,7 @@ namespace Chess
 
         public override Vector[] MoveVectors => moveVectors;
         public override char Notation => 'Q';
+        public override int MaterialValue => 9;
 
         internal override Image GetPieceImage(bool isWhite)
         {
@@ -153,12 +164,17 @@ namespace Chess
             new Vector(0, -1),
             new Vector(-1, 1)
         };
+        private bool Moved;
 
-        public King(bool isWhite) : base(PieceType.King, isWhite) { }
+        public King(bool isWhite) : base(PieceType.King, isWhite)
+        {
+            Moved = false;
+        }
 
         public override Vector[] MoveVectors => moveVectors;
         public override char Notation => 'K';
-
+        public override bool HasMoved() => Moved;
+        public override bool PieceMoved() => Moved = true;
         internal override Image GetPieceImage(bool isWhite)
         {
             string source = "../../../Resources/" + (isWhite ? "w_king.png" : "b_king.png");
@@ -179,8 +195,9 @@ namespace Chess
 
         public override Vector[] MoveVectors => moveVectors;
         public override bool HasMoved() => Moved;
-        public override bool PawnMoved() => Moved = true;
-        public override char Notation => 'P';
+        public override bool PieceMoved() => Moved = true;
+        public override char Notation => ' ';
+        public override int MaterialValue => 1;
 
         internal override Image GetPieceImage(bool isWhite) 
         {
