@@ -161,6 +161,7 @@ namespace Chess
                     }
                 }
             }
+            /*
             bool threatCheck = chessLogic.IsCheck(board, chessLogic.IsWhiteTurn()) ||
                 chessLogic.IsMate(board, !chessLogic.IsWhiteTurn()) ||
                 chessLogic.IsStalemate(board, chessLogic.IsWhiteTurn());
@@ -170,6 +171,7 @@ namespace Chess
                 Button button = boardButtons[kingPosition.X, kingPosition.Y];
                 SetButtonColor(button, Color.Red);
             }
+            */
         }
 
         private void UpdateButtonActions()
@@ -208,7 +210,7 @@ namespace Chess
                 SwitchTurn();
             }
             Update();
-            CheckGameOver();
+            //CheckGameOver();
         }
 
         private void CheckGameOver()

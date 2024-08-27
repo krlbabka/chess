@@ -16,11 +16,11 @@ namespace Chess.Pieces.Strategies
             {
                 return true;
             }
-            if (AddPawnCaptureMoves(board, from, direction))
+            if (AddPawnCaptureMoves(board, from, to, direction))
             {
                 return true;
             }
-            if (AddEnPassantMoves(board, piece, from))
+            if (AddEnPassantMoves(board, piece, from, to))
             {
                 return true;
             }
@@ -32,14 +32,13 @@ namespace Chess.Pieces.Strategies
             lastMove = move;
         }
 
-        private bool AddPawnCaptureMoves(Board board, Vector currentPosition, int direction)
+        private bool AddPawnCaptureMoves(Board board, Vector currentPosition, Vector targetPosition, int direction)
         {
-            Vector[] captureVectors = { new Vector(currentPosition.X + direction, -1), 
-                                        new Vector(currentPosition.X + direction, 1) };
+            Vector[] captureVectors = { new Vector(currentPosition.X + direction, currentPosition.Y -1), 
+                                        new Vector(currentPosition.X + direction, currentPosition.Y + 1) };
             foreach (Vector captureVector in captureVectors)
             {
-                Vector capturePosition = currentPosition + captureVector;
-                if (board.WithinBounds(capturePosition) && board.IsTileOccupied(capturePosition) && board.AreEnemies(currentPosition, capturePosition))
+                if (board.WithinBounds(captureVector) && board.IsTileOccupied(captureVector) && board.AreEnemies(currentPosition, captureVector) && captureVector.IsEqual(targetPosition))
                 {
                     return true;
                 }
@@ -47,7 +46,7 @@ namespace Chess.Pieces.Strategies
             return false;
         }
 
-        private bool AddEnPassantMoves(Board board, Piece piece, Vector currentPosition)
+        private bool AddEnPassantMoves(Board board, Piece piece, Vector currentPosition, Vector targetPosition)
         {
             Vector[] enPassantVectors = { new Vector(0, -1), new Vector(0, 1) };
 
@@ -69,7 +68,14 @@ namespace Chess.Pieces.Strategies
                 if (!board.AreEnemies(currentPosition, pawnPosition))
                     continue;
 
+
                 Vector enPassantTarget = new Vector(lastMove.To.X + (piece.IsWhite ? -1 : 1), lastMove.To.Y);
+
+                if (!enPassantTarget.IsEqual(targetPosition))
+                {
+                    continue;
+                }
+
                 if (board.WithinBounds(enPassantTarget))
                 {
                     return true;

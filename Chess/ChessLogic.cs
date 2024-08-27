@@ -1,5 +1,6 @@
 ﻿using Chess.HelperClasses;
 using Chess.Pieces;
+using System.Diagnostics;
 
 namespace Chess
 {
@@ -157,8 +158,9 @@ namespace Chess
 
         internal bool IsCheck(Board board, bool whiteTurn)
         {
-            Vector kingPosition = FindKingPosition(board, whiteTurn);
-            return IsKingUnderAttack(board, whiteTurn, kingPosition);
+            //Vector kingPosition = FindKingPosition(board, whiteTurn);
+            //return IsKingUnderAttack(board, whiteTurn, kingPosition);
+            return false;
         }
 
         internal bool IsMate(Board board, bool whiteTurn)
@@ -246,6 +248,7 @@ namespace Chess
 
         internal bool CanCastle(Board chessboard, bool white, bool queenSide)
         {
+            return false;
             int row = white ? 7 : 0;
             Tile kingTile = chessboard.BoardGrid[row, 4];
             Tile rookTile = chessboard.BoardGrid[row, queenSide ? 0 : 7];
@@ -323,6 +326,10 @@ namespace Chess
         internal List<PossibleMove> GetPossibleMoves(Board board, Piece piece, Vector currentPosition)
         {
             List<PossibleMove> possibleMoves = new List<PossibleMove>();
+            if (piece.Type == PieceType.Pawn)
+            {
+                piece.SetLastMove(lastMove);
+            }
             PieceType[] slidingPieces = { PieceType.Bishop, PieceType.Rook, PieceType.Queen };
 
             foreach (Tile tile in board.BoardGrid)

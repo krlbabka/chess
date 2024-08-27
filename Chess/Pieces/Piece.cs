@@ -1,4 +1,5 @@
 ﻿using Chess.HelperClasses;
+using Chess.Pieces.Strategies;
 
 namespace Chess.Pieces
 {
@@ -35,5 +36,12 @@ namespace Chess.Pieces
         }
         public virtual bool HasMoved() { return false; }
         public virtual bool PieceMoved() { return false; }
+        public void SetLastMove(Move move)
+        {
+            if (_movable is PawnStrategy x)
+            {
+                x.setLastMove(move);
+            }
+        }
     }
 }
