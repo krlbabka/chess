@@ -29,10 +29,20 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameWindow));
+            ParentGamePanel = new TableLayoutPanel();
             GamePanel = new TableLayoutPanel();
-            ParentGamePanel = new Panel();
+            tableLayoutPanel1 = new TableLayoutPanel();
+            tableLayoutPanel2 = new TableLayoutPanel();
             ParentGamePanel.SuspendLayout();
             SuspendLayout();
+            // 
+            // ParentGamePanel
+            // 
+            resources.ApplyResources(ParentGamePanel, "ParentGamePanel");
+            ParentGamePanel.Controls.Add(GamePanel, 1, 0);
+            ParentGamePanel.Controls.Add(tableLayoutPanel1, 0, 0);
+            ParentGamePanel.Controls.Add(tableLayoutPanel2, 1, 1);
+            ParentGamePanel.Name = "ParentGamePanel";
             // 
             // GamePanel
             // 
@@ -40,11 +50,15 @@
             GamePanel.BackColor = Color.FromArgb(144, 140, 170);
             GamePanel.Name = "GamePanel";
             // 
-            // ParentGamePanel
+            // tableLayoutPanel1
             // 
-            resources.ApplyResources(ParentGamePanel, "ParentGamePanel");
-            ParentGamePanel.Controls.Add(GamePanel);
-            ParentGamePanel.Name = "ParentGamePanel";
+            resources.ApplyResources(tableLayoutPanel1, "tableLayoutPanel1");
+            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            // 
+            // tableLayoutPanel2
+            // 
+            resources.ApplyResources(tableLayoutPanel2, "tableLayoutPanel2");
+            tableLayoutPanel2.Name = "tableLayoutPanel2";
             // 
             // GameWindow
             // 
@@ -61,7 +75,9 @@
 
         #endregion
 
+        private TableLayoutPanel ParentGamePanel;
         private TableLayoutPanel GamePanel;
-        private Panel ParentGamePanel;
+        private TableLayoutPanel tableLayoutPanel1;
+        private TableLayoutPanel tableLayoutPanel2;
     }
 }

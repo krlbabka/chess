@@ -25,10 +25,16 @@ namespace Chess
             IsOccupied = true;
         }
 
-        internal void CreateEmptyTile()
+        internal void SetEmpty()
         {
             IsOccupied = false;
             OccupyingPiece = null;
+        }
+
+        public void SetOccupyingPiece(Piece piece)
+        {
+            OccupyingPiece = piece;
+            IsOccupied = true;
         }
     }
 }

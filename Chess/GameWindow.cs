@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Chess
 {
     public partial class GameWindow : Form
@@ -18,6 +16,7 @@ namespace Chess
             InitializeComponent();
             board.defaultPosition();
             SetupChessboard();
+            SetupCoordinateLabels();
         }
 
         private void GameWindowLoad(object sender, EventArgs e)
@@ -38,6 +37,9 @@ namespace Chess
         {
             Application.Exit();
         }
+        private void SetupCoordinateLabels()
+        {
+        }
 
         private void SetupChessboard()
         {
@@ -53,7 +55,7 @@ namespace Chess
                         BackColor = tileColor,
                         Dock = DockStyle.Fill,
                         FlatStyle = FlatStyle.Flat,
-                        FlatAppearance = {  BorderSize = 0, MouseDownBackColor = tileColor, MouseOverBackColor = tileColor},
+                        FlatAppearance = { BorderSize = 0, MouseDownBackColor = tileColor, MouseOverBackColor = tileColor },
                         Margin = new Padding(0),
                     };
                 }
@@ -129,7 +131,7 @@ namespace Chess
                 {
                     Vector position = new(row, col);
                     Button button = boardButtons[row, col];
-                    
+
                     if (board.BoardGrid[position.X, position.Y].IsOccupied)
                     {
                         Piece piece = board.GetPieceAt(position)!;
@@ -203,7 +205,7 @@ namespace Chess
                 SwitchTurn();
             }
             Update();
-            CheckGameOver();
+            //CheckGameOver();
         }
 
         private void CheckGameOver()
@@ -222,7 +224,7 @@ namespace Chess
             }
         }
 
-        private void Update() 
+        private void Update()
         {
             UpdateChessboard();
             UpdateChessboardGUI();

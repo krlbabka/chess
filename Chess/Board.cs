@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Chess
+﻿namespace Chess
 {
     internal class Board
     {
@@ -57,17 +55,21 @@ namespace Chess
                 BoardGrid[1, col].AddPieceToTile(PieceType.Pawn, false);
                 for (int row = 2; row <= 5; row++)
                 {
-                    BoardGrid[row, col].CreateEmptyTile();
+                    BoardGrid[row, col].SetEmpty();
                 }
                 BoardGrid[6, col].AddPieceToTile(PieceType.Pawn, true);
                 BoardGrid[7, col].AddPieceToTile(BackRankPieces[col], true);
             }
         }
 
-        public Piece? GetPieceAt(Vector position) => BoardGrid[position.X, position.Y].OccupyingPiece;
-        public Piece? GetPieceAt(Tile tile) => tile.OccupyingPiece;
-        public bool IsTileOccupied(Vector position) => BoardGrid[position.X, position.Y].IsOccupied;
-        public bool IsTileOccupied(Tile tile) => tile.IsOccupied;
+        internal Piece? GetPieceAt(Vector position) => BoardGrid[position.X, position.Y].OccupyingPiece;
+        internal Piece? GetPieceAt(Tile tile) => tile.OccupyingPiece;
+        internal bool IsTileOccupied(Vector position) => BoardGrid[position.X, position.Y].IsOccupied;
+        internal bool IsTileOccupied(Tile tile) => tile.IsOccupied;
+        internal bool IsPieceOnTile(Tile tile, PieceType type)
+        {
+            return tile.OccupyingPiece.Type == type;
+        }
 
         internal void ResetLegalMoves()
         {

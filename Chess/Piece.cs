@@ -1,5 +1,4 @@
-﻿
-namespace Chess
+﻿namespace Chess
 {
     internal enum PieceType
     {
