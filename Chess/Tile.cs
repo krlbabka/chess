@@ -1,4 +1,5 @@
-﻿using static Chess.Piece;
+﻿using Chess.HelperClasses;
+using Chess.Pieces;
 
 namespace Chess
 {
@@ -21,7 +22,7 @@ namespace Chess
 
         internal void AddPieceToTile(PieceType type, bool isWhite)
         {
-            OccupyingPiece = CreatePiece(type, isWhite);
+            OccupyingPiece = PieceFactory.CreatePiece(type, isWhite);
             IsOccupied = true;
         }
 

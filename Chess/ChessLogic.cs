@@ -1,54 +1,8 @@
-﻿namespace Chess
+﻿using Chess.HelperClasses;
+using Chess.Pieces;
+
+namespace Chess
 {
-    public class Vector
-    {
-        public int X { get; }
-        public int Y { get; }
-        public Vector(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public static Vector operator +(Vector first, Vector second)
-        {
-            return new Vector(first.X + second.X, first.Y + second.Y);
-        }
-
-        public static Vector operator -(Vector first, Vector second)
-        {
-            return new Vector(first.X - second.X, first.Y - second.Y);
-        }
-
-        public static Vector operator *(Vector vector, int value)
-        {
-            return new Vector(vector.X * value, vector.Y * value);
-        }
-
-        public bool IsEqual(Vector Other)
-        {
-            return X == Other.X && Y == Other.Y;
-        }
-    }
-    public enum MoveType
-    {
-        Normal,
-        EnPassant,
-        Castling,
-        Promotion
-    }
-
-    internal class PossibleMove 
-    {
-        public Vector vector;
-        public MoveType moveType;
-        public PossibleMove(Vector vector, MoveType moveType = MoveType.Normal)
-        {
-            this.vector = vector;
-            this.moveType = moveType;
-        }
-    }
-
     internal class Move
     {
         public Vector From { get; set; }
@@ -203,8 +157,8 @@
 
         internal bool IsCheck(Board board, bool whiteTurn)
         {
-            //return IsKingUnderAttack(board, whiteTurn);
-            return false;
+            Vector kingPosition = FindKingPosition(board, whiteTurn);
+            return IsKingUnderAttack(board, whiteTurn, kingPosition);
         }
 
         internal bool IsMate(Board board, bool whiteTurn)
@@ -371,6 +325,14 @@
             List<PossibleMove> possibleMoves = new List<PossibleMove>();
             PieceType[] slidingPieces = { PieceType.Bishop, PieceType.Rook, PieceType.Queen };
 
+            foreach (Tile tile in board.BoardGrid)
+            {
+                if (piece.CanMove(board, currentPosition, tile.Position))
+                {
+                    possibleMoves.Add(new PossibleMove(tile.Position));
+                }
+            }
+            /*
             foreach (Vector vector in piece.MoveVectors)
             {
                 if (slidingPieces.Contains(piece.Type))
@@ -411,36 +373,8 @@
                         distance++;
                     }
                 }
-                else if (piece.Type == PieceType.Pawn)
-                {
-                    List<Vector> MoveVectors = new List<Vector> { vector };
-                    Vector[] CaptureVectors = { new Vector(vector.X, -1), new Vector(vector.X, 1) };
-
-                    AddPawnMoves(board, piece, possibleMoves, MoveVectors, currentPosition);
-                    AddPawnCaptureMoves(board, possibleMoves, CaptureVectors, currentPosition);
-                    AddEnPassantMoves(board, piece, possibleMoves, currentPosition);
-                }
                 else
                 {
-                    // For Knight & King
-                    var newX = currentPosition.X + vector.X;
-                    var newY = currentPosition.Y + vector.Y;
-                    Vector newPosition = new Vector(newX, newY);
-                    if (board.WithinBounds(newPosition))
-                    {
-                        if (board.IsTileOccupied(newPosition))
-                        {
-                            if (board.AreEnemies(currentPosition, newPosition))
-                            {
-                                possibleMoves.Add(new PossibleMove(newPosition));
-                            }
-                        }
-                        else
-                        {
-                            possibleMoves.Add(new PossibleMove(newPosition));
-                        }
-                    }
-
                     if (piece.Type == PieceType.King)
                     {
                         bool canCastleQueenSide = CanCastle(board, piece.IsWhite, true);
@@ -458,6 +392,7 @@
                     }
                 }
             }
+            */
             return possibleMoves;
         }
 
@@ -491,75 +426,6 @@
         }
 
         // ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
-        // Pawn movement
-        // ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
-
-        private void AddPawnMoves(Board board, Piece piece, List<PossibleMove> possibleMoves, List<Vector> moveVectors, Vector currentPosition)
-        {
-            if (!piece.HasMoved() && !board.IsTileOccupied(currentPosition + moveVectors[0]))
-            {
-                moveVectors.Add(new Vector(moveVectors[0].X * 2, 0));
-            }
-
-            foreach (Vector moveVector in moveVectors)
-            {
-                Vector movePosition = currentPosition + moveVector;
-                if (board.WithinBounds(movePosition) && !board.IsTileOccupied(movePosition))
-                {
-                    possibleMoves.Add(new PossibleMove(movePosition));
-                }
-            }
-        }
-
-        private void AddPawnCaptureMoves(Board board, List<PossibleMove> possibleMoves, Vector[] captureVectors, Vector currentPosition)
-        {
-            foreach (Vector captureVector in captureVectors)
-            {
-                Vector capturePosition = currentPosition + captureVector;
-                if (board.WithinBounds(capturePosition) && board.IsTileOccupied(capturePosition) && board.AreEnemies(currentPosition, capturePosition))
-                {
-                    possibleMoves.Add(new PossibleMove(capturePosition));
-                }
-            }
-        }
-
-        private void AddEnPassantMoves(Board board, Piece piece, List<PossibleMove> possibleMoves, Vector currentPosition)
-        {
-            Vector[] enPassantVectors = { new Vector(0, -1), new Vector(0, 1) };
-
-            foreach (Vector ePVector in enPassantVectors)
-            {
-                Vector pawnPosition = currentPosition + ePVector;
-                if (lastMove == null) 
-                    continue;
-
-                if (lastMove.MovedPiece.Type != PieceType.Pawn)
-                    continue;
-
-                if (Math.Abs(lastMove.To.X - lastMove.From.X) != 2)
-                    continue;
-
-                if (!lastMove.To.IsEqual(pawnPosition))
-                    continue;
-
-                if (!board.AreEnemies(currentPosition, pawnPosition))
-                    continue;
-
-                Vector enPassantTarget = new Vector(lastMove.To.X + (piece.IsWhite ? -1 : 1), lastMove.To.Y);
-                if (board.WithinBounds(enPassantTarget))
-                {
-                    possibleMoves.Add(new PossibleMove(enPassantTarget, MoveType.EnPassant));
-                }
-            }
-        }
-
-        // ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
-        // King movement
-        // ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
-
-
-
-        // ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
         // ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
 
         #endregion
@@ -569,9 +435,8 @@
         // ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
         // ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
 
-        internal bool IsKingUnderAttack(Board board, bool isKingWhite)
+        internal bool IsKingUnderAttack(Board board, bool isKingWhite, Vector kingPosition)
         {
-            Vector kingPosition = FindKingPosition(board, isKingWhite);
             for (int row = 0; row < board.GetBoardSize(); row++)
             {
                 for (int col = 0; col < board.GetBoardSize(); col++)
@@ -598,21 +463,20 @@
 
         internal Vector FindKingPosition(Board chessboard, bool isKingWhite)
         {
-            Vector kingPosition = isKingWhite ? new Vector(0, 4) : new Vector(7, 4);
-            for (int row = 0; row < board.GetBoardSize(); row++)
+            for (int row = 0; row < chessboard.GetBoardSize(); row++)
             {
-                for (int col = 0; col < board.GetBoardSize(); col++)
+                for (int col = 0; col < chessboard.GetBoardSize(); col++)
                 {
                     Vector current = new(row, col);
                     if (chessboard.IsTileOccupied(current) &&
                         chessboard.GetPieceAt(current).Type == PieceType.King &&
                         chessboard.GetPieceAt(current).IsWhite == isKingWhite)
                     {
-                        kingPosition = new Vector(row, col);
+                        return new Vector(row, col);
                     }
                 }
             }
-            return kingPosition;
+            throw new InvalidOperationException("King not found on the board.");
         }
 
         private bool PotentialCheckAfterMove(Vector from, Vector to)

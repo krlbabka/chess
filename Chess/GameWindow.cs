@@ -1,3 +1,6 @@
+using Chess.HelperClasses;
+using Chess.Pieces;
+
 namespace Chess
 {
     public partial class GameWindow : Form
@@ -205,7 +208,7 @@ namespace Chess
                 SwitchTurn();
             }
             Update();
-            //CheckGameOver();
+            CheckGameOver();
         }
 
         private void CheckGameOver()

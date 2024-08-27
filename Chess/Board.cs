@@ -1,4 +1,7 @@
-﻿namespace Chess
+﻿using Chess.HelperClasses;
+using Chess.Pieces;
+
+namespace Chess
 {
     internal class Board
     {
