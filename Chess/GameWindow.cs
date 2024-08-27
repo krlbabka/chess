@@ -17,10 +17,10 @@ namespace Chess
             chessLogic = new ChessLogic(board);
             InitializeComponent();
             board.defaultPosition();
-            SetupChessboard(board);
+            SetupChessboard();
         }
 
-        private void GameWindow_Load(object sender, EventArgs e)
+        private void GameWindowLoad(object sender, EventArgs e)
         {
             Size = new Size(920, 720);
             ParentGamePanel.Controls.Add(GamePanel);
@@ -31,38 +31,24 @@ namespace Chess
             GamePanel.Dock = DockStyle.Fill;
             UpdateChessboard();
 
-            FormClosing += (sender, e) => GameWindow_Closing();
+            FormClosing += (sender, e) => GameWindowClosing();
         }
 
-        private void GameWindow_Closing()
+        private void GameWindowClosing()
         {
-            for (int row = 0; row < Board.BOARD_SIZE; row++)
-            {
-                for (int col = 0; col < Board.BOARD_SIZE; col++)
-                {
-                    if (boardButtons[row, col] != null)
-                    {
-                        boardButtons[row, col].Click -= (sender, e) =>
-                        {
-                            Debug.WriteLine($"{row} {col}");
-                        };
-                    }
-                }
-            }
             Application.Exit();
         }
 
-        private void SetupChessboard(Board board)
+        private void SetupChessboard()
         {
             boardButtons = new Button[Board.BOARD_SIZE, Board.BOARD_SIZE];
             for (int row = 0; row < Board.BOARD_SIZE; row++)
             {
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
-                    int rowVar = row;
-                    int colVar = col;
-                    Color tileColor = (rowVar + colVar) % 2 == 0 ? Color.White : Color.Black;
-                    boardButtons[rowVar, colVar] = new Button
+                    Vector currentPosition = new(row, col);
+                    Color tileColor = (currentPosition.X + currentPosition.Y) % 2 == 0 ? Color.White : Color.Black;
+                    boardButtons[currentPosition.X, currentPosition.Y] = new Button
                     {
                         BackColor = tileColor,
                         Dock = DockStyle.Fill,
@@ -72,7 +58,7 @@ namespace Chess
                     };
                 }
             }
-            updateGUI();
+            UpdateChessboardGUI();
         }
 
         private void UpdateChessboard()
@@ -84,12 +70,12 @@ namespace Chess
                     Vector position = new Vector(row, col);
                     Button button = boardButtons[row, col];
 
-                    button.Click -= Button_Click;
+                    button.Click -= ButtonClick;
                     if (board.IsTileOccupied(position))
                     {
                         if (board.GetPieceAtPosition(position)!.IsWhite == chessLogic.IsWhiteTurn())
                         {
-                            button.Click += Button_Click;
+                            button.Click += ButtonClick;
                         }
                         else
                         {
@@ -105,18 +91,18 @@ namespace Chess
             }
         }
 
-        private void Button_Click(object sender, EventArgs e)
+        private void ButtonClick(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             int rowVar = GamePanel.GetRow(button);
             int colVar = GamePanel.GetColumn(button);
             ClickedPosition = new Vector(rowVar, colVar);
             board.FindLegalTiles(board.BoardGrid[rowVar, colVar], board.GetPieceAtPosition(ClickedPosition));
-            updateGUI();
-            updateActions();
+            UpdateChessboardGUI();
+            UpdateButtonActions();
         }
 
-        private void Move_Click(object sender, EventArgs e)
+        private void MoveClick(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             int rowVar = GamePanel.GetRow(button);
@@ -130,18 +116,18 @@ namespace Chess
             boardButtons[rowVar, colVar].Click += (sender, e) =>
             {
                 board.ResetLegalTiles();
-                updateGUI();
-                updateActions();
+                UpdateChessboardGUI();
+                UpdateButtonActions();
             };
         }
 
-        private void updateGUI()
+        private void UpdateChessboardGUI()
         {
             for (int row = 0; row < Board.BOARD_SIZE; row++)
             {
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
-                    Vector position = new Vector(row, col);
+                    Vector position = new(row, col);
                     Button button = boardButtons[row, col];
                     
                     if (board.BoardGrid[position.X, position.Y].IsOccupied)
@@ -153,6 +139,7 @@ namespace Chess
                     {
                         SetPieceImage(button, null);
                     }
+                    // Button highlights
                     if (board.BoardGrid[position.X, position.Y].LegalMove)
                     {
                         SetButtonColor(button, Color.Green);
@@ -168,15 +155,21 @@ namespace Chess
                     }
                 }
             }
-            if (board.IsKingUnderAttack(chessLogic.IsWhiteTurn()))
+            if (chessLogic.IsCheck(board, chessLogic.IsWhiteTurn()))
             {
-                Vector kingPosition = board.FindKingPosition(chessLogic.IsWhiteTurn());
+                Vector kingPosition = board.FindKingPosition(board, chessLogic.IsWhiteTurn());
+                Button button = boardButtons[kingPosition.X, kingPosition.Y];
+                SetButtonColor(button, Color.Red);
+            }
+            if(chessLogic.IsMate(board, chessLogic.IsWhiteTurn()))
+            {
+                Vector kingPosition = board.FindKingPosition(board, !chessLogic.IsWhiteTurn());
                 Button button = boardButtons[kingPosition.X, kingPosition.Y];
                 SetButtonColor(button, Color.Red);
             }
         }
 
-        private void updateActions() 
+        private void UpdateButtonActions() 
         {
             for (int row = 0; row < Board.BOARD_SIZE; row++)
             {
@@ -186,12 +179,12 @@ namespace Chess
                     int colVar = col;
                     if (board.BoardGrid[rowVar, colVar].LegalMove)
                     {
-                        boardButtons[rowVar, colVar].Click -= Button_Click;
-                        boardButtons[rowVar, colVar].Click += Move_Click;
+                        boardButtons[rowVar, colVar].Click -= ButtonClick;
+                        boardButtons[rowVar, colVar].Click += MoveClick;
                     }
                     else
                     {
-                        boardButtons[rowVar, colVar].Click -= Move_Click;
+                        boardButtons[rowVar, colVar].Click -= MoveClick;
                     }
                 }
             }
@@ -209,35 +202,42 @@ namespace Chess
             {
                 chessLogic.MovePiece(board, Current, New);
                 LastMove = New;
-                if (chessLogic.IsMate())
+                Update();
+                if (chessLogic.IsMate(board, chessLogic.IsWhiteTurn()))
                 {
                     GameOver("Mate");
                     return;
                 }
-                if (chessLogic.IsDraw())
-                {
-                    GameOver($"Draw");
-                    return;
-                }
                 SwitchTurn();
             }
-            UpdateChessboard();
-            updateGUI();
-            updateActions();
+            Update();
             if (chessLogic.IsStalemate())
             {
                 GameOver("Stalemate");
                 return;
             }
+            if (chessLogic.IsDraw())
+            {
+                Update();
+                GameOver($"Draw");
+                return;
+            }
         }
 
-        private void SetPieceImage(Button button, Image pieceImage)
+        private void Update() 
         {
-            button.Image = pieceImage;
-            button.ImageAlign = ContentAlignment.MiddleCenter;
+            UpdateChessboard();
+            UpdateChessboardGUI();
+            UpdateButtonActions();
         }
 
-        private void SetButtonColor(Button b, Color color)
+        private static void SetPieceImage(Button b, Image pieceImage)
+        {
+            b.Image = pieceImage;
+            b.ImageAlign = ContentAlignment.MiddleCenter;
+        }
+
+        private static void SetButtonColor(Button b, Color color)
         {
             b.BackColor = color;
             b.FlatAppearance.MouseDownBackColor = color;

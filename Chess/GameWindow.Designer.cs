@@ -54,7 +54,7 @@
             Controls.Add(ParentGamePanel);
             ForeColor = Color.FromArgb(224, 222, 244);
             Name = "GameWindow";
-            Load += GameWindow_Load;
+            Load += GameWindowLoad;
             ParentGamePanel.ResumeLayout(false);
             ResumeLayout(false);
         }

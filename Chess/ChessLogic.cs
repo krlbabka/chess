@@ -69,13 +69,16 @@ namespace Chess
         private bool WhiteTurn;
         private List<Move> Moves = new List<Move>();
         private int NoCaptureCounter;
-
+        private int WhiteMaterial;
+        private int BlackMaterial;
 
         public ChessLogic(Board board)
         {
             Chessboard = board;
             WhiteTurn = true;
             NoCaptureCounter = 0;
+            WhiteMaterial = 0;
+            BlackMaterial = 0;
         }
 
         internal bool IsWhiteTurn() => WhiteTurn;
@@ -136,28 +139,28 @@ namespace Chess
 
         internal bool IsCheck(Board chessboard, bool whiteTurn)
         {
-            return chessboard.IsKingUnderAttack(whiteTurn);
+            return chessboard.IsKingUnderAttack(chessboard, whiteTurn);
         }
 
-        internal bool IsMate()
+        internal bool IsMate(Board chessboard, bool whiteTurn)
         {
-            if (IsCheck(Chessboard, !IsWhiteTurn()))
+            if (IsCheck(chessboard, !whiteTurn))
             {
-                for (int row = 0; row < Chessboard.GetBoardSize(); row++)
+                for (int row = 0; row < chessboard.GetBoardSize(); row++)
                 {
-                    for (int col = 0; col < Chessboard.GetBoardSize(); col++)
+                    for (int col = 0; col < chessboard.GetBoardSize(); col++)
                     {
-                        Tile tile = Chessboard.BoardGrid[row, col];
+                        Tile tile = chessboard.BoardGrid[row, col];
                         Vector currentPosition = new Vector(row, col);
-                        if (tile.IsOccupied && tile.OccupyingPiece.IsWhite != IsWhiteTurn())
+                        if (tile.IsOccupied && tile.OccupyingPiece.IsWhite != whiteTurn)
                         {
-                            List<PossibleMove>possibleMoves = Chessboard.GetPossibleMoves(tile.OccupyingPiece, currentPosition);
+                            List<PossibleMove>possibleMoves = chessboard.GetPossibleMoves(tile.OccupyingPiece, currentPosition);
                             foreach (PossibleMove move in possibleMoves)
                             {
                                 Board PotentialBoard = new Board();
-                                PotentialBoard.BoardGrid = Chessboard.getBoardCopy();
+                                PotentialBoard.BoardGrid = chessboard.getBoardCopy();
                                 MovePiece(PotentialBoard, currentPosition, move.vector);
-                                if (!IsCheck(PotentialBoard, !IsWhiteTurn()))
+                                if (!IsCheck(PotentialBoard, !whiteTurn))
                                 {
                                     return false;
                                 }

@@ -100,8 +100,8 @@
 
         internal List<PossibleMove> GetPossibleMoves(Piece piece, Vector currentPosition)
         {
-            List<PossibleMove> possibleMoves = new List<PossibleMove>();
-            PieceType[] multiSquarePieces = { PieceType.Bishop, PieceType.Rook, PieceType.Queen };
+            List<PossibleMove> possibleMoves = [];
+            PieceType[] multiSquarePieces = [PieceType.Bishop, PieceType.Rook, PieceType.Queen];
 
             foreach (Vector vector in piece.MoveVectors)
             {
@@ -210,17 +210,19 @@
             return possibleMoves;
         }
 
-        internal bool IsKingUnderAttack(bool isKingWhite)
+        internal bool IsKingUnderAttack(Board chessboard, bool isKingWhite)
         {
-            Vector kingPosition = FindKingPosition(isKingWhite);
+            Vector kingPosition = FindKingPosition(chessboard, isKingWhite);
             for (int row = 0; row < BOARD_SIZE; row++)
             {
                 for (int col = 0; col < BOARD_SIZE; col++)
                 {
-                    if (BoardGrid[row, col].IsOccupied && BoardGrid[row, col].OccupyingPiece.IsWhite != isKingWhite)
+                    Vector currentPosition = new Vector(row, col);
+                    if (chessboard.IsTileOccupied(currentPosition) && 
+                        chessboard.GetPieceAtPosition(currentPosition).IsWhite != isKingWhite)
                     {
-                        Piece piece = BoardGrid[row, col].OccupyingPiece;
-                        List<PossibleMove> possibleMoves = GetPossibleMoves(piece, new Vector(row, col));
+                        Piece piece = chessboard.GetPieceAtPosition(currentPosition);
+                        List<PossibleMove> possibleMoves = chessboard.GetPossibleMoves(piece, currentPosition);
 
                         foreach (PossibleMove move in possibleMoves)
                         {
@@ -235,14 +237,17 @@
             return false;
         }
 
-        internal Vector FindKingPosition(bool isKingWhite)
+        internal Vector FindKingPosition(Board chessboard, bool isKingWhite)
         {
             Vector kingPosition = isKingWhite ? new Vector(0, 4) : new Vector(7, 4);
             for (int row = 0; row < BOARD_SIZE; row++)
             {
                 for (int col = 0; col < BOARD_SIZE; col++)
                 {
-                    if (BoardGrid[row, col].IsOccupied && BoardGrid[row, col].OccupyingPiece.Type == PieceType.King && BoardGrid[row, col].OccupyingPiece.IsWhite == isKingWhite)
+                    Vector current = new(row, col);
+                    if (chessboard.IsTileOccupied(current) && 
+                        chessboard.GetPieceAtPosition(current).Type == PieceType.King && 
+                        chessboard.GetPieceAtPosition(current).IsWhite == isKingWhite)
                     {
                         kingPosition = new Vector(row, col);
                     }
@@ -258,7 +263,7 @@
 
         private bool AreEnemies(Vector myPosition, Vector newPosition)
         {
-            return BoardGrid[myPosition.X, myPosition.Y].OccupyingPiece.IsWhite != BoardGrid[newPosition.X, newPosition.Y].OccupyingPiece.IsWhite;
+            return GetPieceAtPosition(myPosition).IsWhite != GetPieceAtPosition(newPosition).IsWhite;
         }
     }
 }
