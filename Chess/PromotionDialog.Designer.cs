@@ -65,7 +65,6 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "Form1";
             TopMost = true;
-            Load += PromotionDialog_Load;
             ResumeLayout(false);
         }
 

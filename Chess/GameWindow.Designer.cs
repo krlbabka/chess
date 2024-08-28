@@ -30,9 +30,9 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameWindow));
             ParentGamePanel = new TableLayoutPanel();
-            GamePanel = new TableLayoutPanel();
-            RankLabels = new TableLayoutPanel();
             FileLabels = new TableLayoutPanel();
+            RankLabels = new TableLayoutPanel();
+            GamePanel = new TableLayoutPanel();
             label1 = new Label();
             label2 = new Label();
             ParentGamePanel.SuspendLayout();
@@ -41,26 +41,28 @@
             // ParentGamePanel
             // 
             resources.ApplyResources(ParentGamePanel, "ParentGamePanel");
+            ParentGamePanel.Controls.Add(label2, 1, 3);
             ParentGamePanel.Controls.Add(FileLabels, 1, 2);
+            ParentGamePanel.Controls.Add(label1, 1, 0);
             ParentGamePanel.Controls.Add(RankLabels, 0, 1);
             ParentGamePanel.Controls.Add(GamePanel, 1, 1);
             ParentGamePanel.Name = "ParentGamePanel";
             // 
-            // GamePanel
+            // FileLabels
             // 
-            resources.ApplyResources(GamePanel, "GamePanel");
-            GamePanel.BackColor = Color.FromArgb(144, 140, 170);
-            GamePanel.Name = "GamePanel";
+            resources.ApplyResources(FileLabels, "FileLabels");
+            FileLabels.Name = "FileLabels";
             // 
             // RankLabels
             // 
             resources.ApplyResources(RankLabels, "RankLabels");
             RankLabels.Name = "RankLabels";
             // 
-            // FileLabels
+            // GamePanel
             // 
-            resources.ApplyResources(FileLabels, "FileLabels");
-            FileLabels.Name = "FileLabels";
+            resources.ApplyResources(GamePanel, "GamePanel");
+            GamePanel.BackColor = Color.FromArgb(144, 140, 170);
+            GamePanel.Name = "GamePanel";
             // 
             // label1
             // 
@@ -77,15 +79,13 @@
             resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(25, 23, 36);
-            Controls.Add(label2);
-            Controls.Add(label1);
             Controls.Add(ParentGamePanel);
             ForeColor = Color.FromArgb(224, 222, 244);
             Name = "GameWindow";
             Load += GameWindowLoad;
             ParentGamePanel.ResumeLayout(false);
+            ParentGamePanel.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion

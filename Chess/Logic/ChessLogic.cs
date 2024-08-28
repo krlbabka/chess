@@ -18,6 +18,8 @@ namespace Chess.Logic
         private List<Piece> WhiteTakenPieces;
         private List<Piece> BlackTakenPieces;
 
+        public event Action<bool, Action<PieceType>> OnPromotion;
+
         public ChessLogic(Board board)
         {
             this.board = board;
@@ -85,13 +87,16 @@ namespace Chess.Logic
 
                 if (!simulatingMove)
                 {
-                    FiftyMoveCounter = isCapture || isPawnMove ? 0 : FiftyMoveCounter + 1;
+                    
                     if (isCapture || isPawnMove)
                     {
                         FiftyMoveCounter = 0;
                         boardStateCounts.Clear();
                     }
-                    else FiftyMoveCounter++;
+                    else 
+                    {
+                        FiftyMoveCounter++;
+                    }
 
                     SaveBoardState();
 
@@ -141,11 +146,15 @@ namespace Chess.Logic
                     chessboard.BoardGrid[rookOriginalPosition.X, rookOriginalPosition.Y].SetEmpty();
                 }
             }
-            /*
             if (newTile.MoveType == MoveType.Promotion)
             {
-                newTile.OccupyingPiece = PieceFactory.CreatePiece(PieceType.Queen, IsWhiteTurn());
-            }*/
+                bool isWhite = board.GetPieceAt(newTile).IsWhite;
+                OnPromotion?.Invoke(board.GetPieceAt(newTile).IsWhite, (pieceType) => 
+                {
+                    board.BoardGrid[newTile.Position.X, newTile.Position.Y].SetEmpty();
+                    board.BoardGrid[newTile.Position.X, newTile.Position.Y].AddPieceToTile(pieceType, isWhite);
+                });
+            }
         }
 
         internal void FindLegalTiles(Board board, Tile CurrentTile, Piece ChessPiece)
@@ -346,7 +355,6 @@ namespace Chess.Logic
 
             return IsCheck(PotentialBoard, IsWhiteTurn());
         }
-
         private string GenerateBoardString()
         {
             StringBuilder sb = new StringBuilder();
@@ -369,7 +377,6 @@ namespace Chess.Logic
             }
             return sb.ToString();
         }
-
         public void SaveBoardState()
         {
             string boardState = GenerateBoardString();

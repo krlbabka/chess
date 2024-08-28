@@ -64,10 +64,5 @@ namespace Chess
             DialogResult = DialogResult.OK;
             Close();
         }
-
-        private void PromotionDialog_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }

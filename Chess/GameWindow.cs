@@ -17,6 +17,7 @@ namespace Chess
         {
             board = new Board();
             chessLogic = new ChessLogic(board);
+            chessLogic.OnPromotion += HandlePromotionDialog;
             InitializeComponent();
             board.defaultPosition();
             SetupChessboard();
@@ -184,6 +185,8 @@ namespace Chess
                     {
                         SetPieceImage(button, null);
                     }
+
+                    // Button highlights
                     if (!board.BoardGrid[position.X, position.Y].LegalMove)
                     {
                         Color btnColor = (position.X + position.Y) % 2 == 0 ? Color.White : Color.Black;
@@ -191,9 +194,8 @@ namespace Chess
                     }
                     if (LastMove != null && position.IsEqual(LastMove))
                     {
-                        SetButtonColor(button, Color.BlueViolet);
+                        SetButtonColor(button, Color.Gray);
                     }
-                    // Button highlights
                     if (board.BoardGrid[position.X, position.Y].LegalMove)
                     {
                         SetButtonColor(button, Color.Green);
@@ -210,9 +212,24 @@ namespace Chess
                 Button button = boardButtons[kingPosition.X, kingPosition.Y];
                 SetButtonColor(button, Color.Red);
             }
+            int materialDiff = chessLogic.GetMaterialDifference();
+            if (materialDiff > 0)
+            {
+                label1.Text = materialDiff.ToString();
+                label2.Text = " ";
 
-            label1.Text = chessLogic.GetMaterialValue(true).ToString();
-            label2.Text = chessLogic.GetMaterialValue(false).ToString();
+            }
+            else if (materialDiff < 0)
+            {
+                label1.Text = " ";
+                label2.Text = (-materialDiff).ToString();
+            }
+            else
+            {
+                label1.Text = " ";
+                label2.Text = " ";
+            }
+
         }
 
         private void UpdateButtonActions()
@@ -248,8 +265,6 @@ namespace Chess
                 chessLogic.MovePiece(board, Current, New);
                 LastMove = New;
 
-                HandlePromotionDialog(New);
-
                 Update();
                 SwitchTurn();
             }
@@ -273,20 +288,13 @@ namespace Chess
             }
         }
 
-        private void HandlePromotionDialog(Vector position) 
+        private void HandlePromotionDialog(bool isWhite, Action<PieceType> onActionSuccess)
         {
-            Piece movedPiece = board.GetPieceAt(position);
-            if (movedPiece is Pawn && (position.X == 0 || position.X == 7))
+            using (PromotionDialog dialog = new PromotionDialog(isWhite, this))
             {
-                // Display the promotion dialog
-                using (PromotionDialog dialog = new PromotionDialog(movedPiece.IsWhite, this))
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (dialog.ShowDialog() == DialogResult.OK)
-                    {
-                        PieceType promotionPieceType = dialog.SelectedPieceType;
-                        board.BoardGrid[position.X, position.Y].SetEmpty();
-                        board.BoardGrid[position.X, position.Y].AddPieceToTile(promotionPieceType, movedPiece.IsWhite);
-                    }
+                    onActionSuccess?.Invoke(dialog.SelectedPieceType);
                 }
             }
         }
