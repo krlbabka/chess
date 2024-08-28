@@ -1,8 +1,6 @@
 using Chess.HelperClasses;
 using Chess.Logic;
 using Chess.Pieces;
-using System.Diagnostics;
-using System.Xml;
 
 namespace Chess
 {
@@ -32,8 +30,11 @@ namespace Chess
             ParentGamePanel.Dock = DockStyle.None;
             ParentGamePanel.Top = 35;
             ParentGamePanel.Left = 35;
-            ParentGamePanel.Size = new Size(600, 600);
+            ParentGamePanel.Size = new Size(620, 620);
+
             GamePanel.Dock = DockStyle.Fill;
+            GamePanel.Size = new Size(600, 600);
+            GamePanel.Margin = new Padding(0, 0, 0, 0);
             UpdateChessboard();
 
             FormClosing += (sender, e) => GameWindowClosing();
@@ -45,6 +46,43 @@ namespace Chess
         }
         private void SetupCoordinateLabels()
         {
+            Label[] rowLabels = new Label[Board.BOARD_SIZE];
+            Label[] colLabels = new Label[Board.BOARD_SIZE];
+
+            RankLabels.Size = new Size(20, GamePanel.Height);
+            RankLabels.Dock = DockStyle.Fill;
+            RankLabels.Margin = new Padding(0, 0, 0, 0);
+
+            FileLabels.Size = new Size(GamePanel.Width, 20);
+            FileLabels.Dock = DockStyle.Top;
+            FileLabels.Margin = new Padding(0, 0, 0, 0);
+
+
+            for (int i = 0; i < Board.BOARD_SIZE; i++)
+            {
+                rowLabels[i] = new Label
+                {
+                    Text = (8 - i).ToString(),
+                    TextAlign = ContentAlignment.MiddleRight,
+                    Font = new Font("Verdana", 10, FontStyle.Bold),
+                    Anchor = AnchorStyles.Top | AnchorStyles.Bottom,
+                    Margin = new Padding(0, 0, 0, 0)
+                };
+                RankLabels.Controls.Add(rowLabels[i], 0, i);
+            }
+
+            for (int i = 0; i < Board.BOARD_SIZE; i++)
+            {
+                colLabels[i] = new Label
+                {
+                    Text = ((char)('a' + i)).ToString(),
+                    TextAlign = ContentAlignment.TopCenter,
+                    Font = new Font("Verdana", 10, FontStyle.Bold),
+                    Margin = new Padding(0, 0, 0, 0),
+                    Top = 0
+                };
+                FileLabels.Controls.Add(colLabels[i], i, 0);
+            }
         }
 
         private void SetupChessboard()
@@ -137,7 +175,6 @@ namespace Chess
                 {
                     Vector position = new(row, col);
                     Button button = boardButtons[row, col];
-
                     if (board.BoardGrid[position.X, position.Y].IsOccupied)
                     {
                         Piece piece = board.GetPieceAt(position)!;
@@ -147,13 +184,7 @@ namespace Chess
                     {
                         SetPieceImage(button, null);
                     }
-
-                    // Button highlights
-                    if (board.BoardGrid[position.X, position.Y].LegalMove)
-                    {
-                        SetButtonColor(button, Color.Green);
-                    }
-                    else
+                    if (!board.BoardGrid[position.X, position.Y].LegalMove)
                     {
                         Color btnColor = (position.X + position.Y) % 2 == 0 ? Color.White : Color.Black;
                         SetButtonColor(button, btnColor);
@@ -161,6 +192,11 @@ namespace Chess
                     if (LastMove != null && position.IsEqual(LastMove))
                     {
                         SetButtonColor(button, Color.BlueViolet);
+                    }
+                    // Button highlights
+                    if (board.BoardGrid[position.X, position.Y].LegalMove)
+                    {
+                        SetButtonColor(button, Color.Green);
                     }
                 }
             }
@@ -174,6 +210,9 @@ namespace Chess
                 Button button = boardButtons[kingPosition.X, kingPosition.Y];
                 SetButtonColor(button, Color.Red);
             }
+
+            label1.Text = chessLogic.GetMaterialValue(true).ToString();
+            label2.Text = chessLogic.GetMaterialValue(false).ToString();
         }
 
         private void UpdateButtonActions()
@@ -209,6 +248,8 @@ namespace Chess
                 chessLogic.MovePiece(board, Current, New);
                 LastMove = New;
 
+                HandlePromotionDialog(New);
+
                 Update();
                 SwitchTurn();
             }
@@ -229,6 +270,24 @@ namespace Chess
             if (chessLogic.IsDraw())
             {
                 GameOver($"Draw");
+            }
+        }
+
+        private void HandlePromotionDialog(Vector position) 
+        {
+            Piece movedPiece = board.GetPieceAt(position);
+            if (movedPiece is Pawn && (position.X == 0 || position.X == 7))
+            {
+                // Display the promotion dialog
+                using (PromotionDialog dialog = new PromotionDialog(movedPiece.IsWhite, this))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        PieceType promotionPieceType = dialog.SelectedPieceType;
+                        board.BoardGrid[position.X, position.Y].SetEmpty();
+                        board.BoardGrid[position.X, position.Y].AddPieceToTile(promotionPieceType, movedPiece.IsWhite);
+                    }
+                }
             }
         }
 

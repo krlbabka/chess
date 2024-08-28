@@ -31,17 +31,19 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameWindow));
             ParentGamePanel = new TableLayoutPanel();
             GamePanel = new TableLayoutPanel();
-            tableLayoutPanel1 = new TableLayoutPanel();
-            tableLayoutPanel2 = new TableLayoutPanel();
+            RankLabels = new TableLayoutPanel();
+            FileLabels = new TableLayoutPanel();
+            label1 = new Label();
+            label2 = new Label();
             ParentGamePanel.SuspendLayout();
             SuspendLayout();
             // 
             // ParentGamePanel
             // 
             resources.ApplyResources(ParentGamePanel, "ParentGamePanel");
-            ParentGamePanel.Controls.Add(GamePanel, 1, 0);
-            ParentGamePanel.Controls.Add(tableLayoutPanel1, 0, 0);
-            ParentGamePanel.Controls.Add(tableLayoutPanel2, 1, 1);
+            ParentGamePanel.Controls.Add(FileLabels, 1, 2);
+            ParentGamePanel.Controls.Add(RankLabels, 0, 1);
+            ParentGamePanel.Controls.Add(GamePanel, 1, 1);
             ParentGamePanel.Name = "ParentGamePanel";
             // 
             // GamePanel
@@ -50,34 +52,49 @@
             GamePanel.BackColor = Color.FromArgb(144, 140, 170);
             GamePanel.Name = "GamePanel";
             // 
-            // tableLayoutPanel1
+            // RankLabels
             // 
-            resources.ApplyResources(tableLayoutPanel1, "tableLayoutPanel1");
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
+            resources.ApplyResources(RankLabels, "RankLabels");
+            RankLabels.Name = "RankLabels";
             // 
-            // tableLayoutPanel2
+            // FileLabels
             // 
-            resources.ApplyResources(tableLayoutPanel2, "tableLayoutPanel2");
-            tableLayoutPanel2.Name = "tableLayoutPanel2";
+            resources.ApplyResources(FileLabels, "FileLabels");
+            FileLabels.Name = "FileLabels";
+            // 
+            // label1
+            // 
+            resources.ApplyResources(label1, "label1");
+            label1.Name = "label1";
+            // 
+            // label2
+            // 
+            resources.ApplyResources(label2, "label2");
+            label2.Name = "label2";
             // 
             // GameWindow
             // 
             resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(25, 23, 36);
+            Controls.Add(label2);
+            Controls.Add(label1);
             Controls.Add(ParentGamePanel);
             ForeColor = Color.FromArgb(224, 222, 244);
             Name = "GameWindow";
             Load += GameWindowLoad;
             ParentGamePanel.ResumeLayout(false);
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private TableLayoutPanel ParentGamePanel;
         private TableLayoutPanel GamePanel;
-        private TableLayoutPanel tableLayoutPanel1;
-        private TableLayoutPanel tableLayoutPanel2;
+        private TableLayoutPanel RankLabels;
+        private TableLayoutPanel FileLabels;
+        private Label label1;
+        private Label label2;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Chess.HelperClasses;
 using Chess.Pieces;
-using System.Diagnostics;
+using System.Text;
 
 namespace Chess.Logic
 {
@@ -9,20 +9,24 @@ namespace Chess.Logic
         private readonly Board board;
         private bool whiteTurn;
 
-        private List<Move> Moves = new List<Move>();
+        private List<Move> Moves;
         private Move lastMove;
 
-        private int NoCaptureCounter;
-        private int WhiteMaterial;
-        private int BlackMaterial;
+        private Dictionary<string, int> boardStateCounts;
+
+        private int FiftyMoveCounter;
+        private List<Piece> WhiteTakenPieces;
+        private List<Piece> BlackTakenPieces;
 
         public ChessLogic(Board board)
         {
             this.board = board;
             whiteTurn = true;
-            NoCaptureCounter = 0;
-            WhiteMaterial = 0;
-            BlackMaterial = 0;
+            FiftyMoveCounter = 0;
+            Moves = new List<Move>();
+            boardStateCounts = new Dictionary<string, int>();
+            WhiteTakenPieces = new List<Piece>();
+            BlackTakenPieces = new List<Piece>();
         }
 
         public void setLastMove(Move move) => lastMove = move;
@@ -30,7 +34,14 @@ namespace Chess.Logic
         internal void SwitchTurn() => whiteTurn = !whiteTurn;
         internal int GetMaterialDifference()
         {
-            return WhiteMaterial - BlackMaterial;
+            int whiteValue = BlackTakenPieces.Sum(piece => piece.MaterialValue);
+            int blackValue = WhiteTakenPieces.Sum(piece => piece.MaterialValue);
+            return whiteValue - blackValue;
+        }
+
+        internal int GetMaterialValue(bool isWhite)
+        {
+            return isWhite ? WhiteTakenPieces.Sum(piece => piece.MaterialValue) : BlackTakenPieces.Sum(piece => piece.MaterialValue);
         }
 
         #region Movement
@@ -53,18 +64,36 @@ namespace Chess.Logic
                 bool isPawnMove = CurrentPiece.Type == PieceType.Pawn;
                 bool isKingMove = CurrentPiece.Type == PieceType.King;
                 bool isRookMove = CurrentPiece.Type == PieceType.Rook;
-                NewTile.SetOccupyingPiece(CurrentPiece);
-                CurrentTile.SetEmpty();
+
                 if (!simulatingMove)
                 {
+                    if (isCapture)
+                    {
+                        if (NewTile.OccupyingPiece!.IsWhite)
+                        {
+                            WhiteTakenPieces.Add(NewTile.OccupyingPiece);
+                        }
+                        else
+                        {
+                            BlackTakenPieces.Add(NewTile.OccupyingPiece);
+                        }
+                    }
+                }
+
+                NewTile.SetOccupyingPiece(CurrentPiece);
+                CurrentTile.SetEmpty();
+
+                if (!simulatingMove)
+                {
+                    FiftyMoveCounter = isCapture || isPawnMove ? 0 : FiftyMoveCounter + 1;
                     if (isCapture || isPawnMove)
                     {
-                        NoCaptureCounter = 0;
+                        FiftyMoveCounter = 0;
+                        boardStateCounts.Clear();
                     }
-                    else
-                    {
-                        NoCaptureCounter++;
-                    }
+                    else FiftyMoveCounter++;
+
+                    SaveBoardState();
 
                     if (isPawnMove || isKingMove || isRookMove)
                     {
@@ -95,27 +124,28 @@ namespace Chess.Logic
 
                 if (isQueenSide)
                 {
-                    // Move the rook from a1 to d1 (for white) or a8 to d8 (for black)
                     Vector rookOriginalPosition = new Vector(KingPiece.IsWhite ? 7 : 0, 0);
                     Vector rookTargetPosition = new Vector(KingPiece.IsWhite ? 7 : 0, 3);
 
-                    // Move the rook to its new position
                     chessboard.BoardGrid[rookTargetPosition.X, rookTargetPosition.Y].SetOccupyingPiece(
                         chessboard.GetPieceAt(rookOriginalPosition));
                     chessboard.BoardGrid[rookOriginalPosition.X, rookOriginalPosition.Y].SetEmpty();
                 }
                 else if (isKingSide)
                 {
-                    // Move the rook from h1 to f1 (for white) or h8 to f8 (for black)
                     Vector rookOriginalPosition = new Vector(KingPiece.IsWhite ? 7 : 0, 7);
                     Vector rookTargetPosition = new Vector(KingPiece.IsWhite ? 7 : 0, 5);
 
-                    // Move the rook to its new position
                     chessboard.BoardGrid[rookTargetPosition.X, rookTargetPosition.Y].SetOccupyingPiece(
                         chessboard.GetPieceAt(rookOriginalPosition));
                     chessboard.BoardGrid[rookOriginalPosition.X, rookOriginalPosition.Y].SetEmpty();
                 }
             }
+            /*
+            if (newTile.MoveType == MoveType.Promotion)
+            {
+                newTile.OccupyingPiece = PieceFactory.CreatePiece(PieceType.Queen, IsWhiteTurn());
+            }*/
         }
 
         internal void FindLegalTiles(Board board, Tile CurrentTile, Piece ChessPiece)
@@ -123,17 +153,37 @@ namespace Chess.Logic
             board.ResetLegalMoves();
 
             List<PossibleMove>? possibleMoves = GetPossibleMoves(board, ChessPiece, CurrentTile.Position);
-
+            //Castle checks
             foreach (PossibleMove possibleMove in possibleMoves)
             {
+                if (possibleMove.moveType == MoveType.Castling)
+                {
+                    if (IsCheck(board, IsWhiteTurn()))
+                    {
+                        continue;
+                    }
+                    int direction = (possibleMove.vector.Y - CurrentTile.Position.Y) > 0 ? 1 : -1;
+                    Vector possibleCheckTile = CurrentTile.Position + new Vector(0, direction);
+                    if (PotentialCheckAfterMove(CurrentTile.Position, possibleCheckTile))
+                    {
+                        continue;
+                    }
+                }
                 Vector tileVector = possibleMove.vector;
                 if (board.WithinBounds(tileVector))
                 {
+                    
                     Tile tile = board.BoardGrid[tileVector.X, tileVector.Y];
                     if (board.IsTileOccupied(tileVector) && !board.AreEnemies(CurrentTile.Position, tileVector))
                     {
                         continue;
                     }
+
+                    if (PotentialCheckAfterMove(CurrentTile.Position, tileVector))
+                    {
+                        continue;
+                    }
+
                     tile.LegalMove = true;
                     tile.MoveType = possibleMove.moveType;
                 }
@@ -155,7 +205,7 @@ namespace Chess.Logic
                 if (piece.CanMove(board, currentPosition, tile.Position, out type))
                 {
                     possibleMoves.Add(new PossibleMove(tile.Position, type));
-                    
+
                 }
             }
             return possibleMoves;
@@ -177,7 +227,7 @@ namespace Chess.Logic
             {
                 return false;
             }
-            foreach(Tile tile in board.BoardGrid)
+            foreach (Tile tile in board.BoardGrid)
             {
                 if (tile.IsOccupied && tile.OccupyingPiece.IsWhite == whiteTurn)
                 {
@@ -223,19 +273,25 @@ namespace Chess.Logic
 
         internal bool IsDraw()
         {
-            return Repetition() || FiftyMoveRule();
+            return Repetition() || FiftyMoveRule() || IsInsufficientMaterial();
         }
 
         private bool Repetition()
         {
-            //save a list of chessboard states, if a pawn is pushed / piece taken -> I can delete all prior board states
+            foreach (var count in boardStateCounts.Values)
+            {
+                if (count >= 3)
+                {
+                    return true;
+                }
+            }
             return false;
         }
 
         private bool FiftyMoveRule()
         {
             // 50 turns -> 100 moves
-            return NoCaptureCounter >= 100;
+            return FiftyMoveCounter >= 100;
         }
 
         #endregion
@@ -264,7 +320,7 @@ namespace Chess.Logic
         {
             foreach (Tile tile in chessboard.BoardGrid)
             {
-                if (tile.IsOccupied 
+                if (tile.IsOccupied
                     && tile.OccupyingPiece.Type == PieceType.King
                     && tile.OccupyingPiece.IsWhite == isKingWhite)
                 {
@@ -289,6 +345,87 @@ namespace Chess.Logic
             MovePiece(PotentialBoard, from, to, true);
 
             return IsCheck(PotentialBoard, IsWhiteTurn());
+        }
+
+        private string GenerateBoardString()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int row = 0; row < 8; row++)
+            {
+                for (int col = 0; col < 8; col++)
+                {
+                    Tile tile = board.BoardGrid[row, col];
+                    if (tile.IsOccupied)
+                    {
+                        Piece piece = tile.OccupyingPiece;
+                        sb.Append(piece.IsWhite ? 'w' : 'b');
+                        sb.Append(piece.Notation);
+                    }
+                    else
+                    {
+                        sb.Append("-");
+                    }
+                }
+            }
+            return sb.ToString();
+        }
+
+        public void SaveBoardState()
+        {
+            string boardState = GenerateBoardString();
+            if (boardStateCounts.ContainsKey(boardState))
+            {
+                boardStateCounts[boardState]++;
+            }
+            else
+            {
+                boardStateCounts[boardState] = 1;
+            }
+        }
+
+        internal bool IsInsufficientMaterial()
+        {
+            string boardString = GenerateBoardString();
+
+            int kingCount = boardString.Count(c => c == 'K');
+            int queenCount = boardString.Count(c => c == 'Q');
+            int rookCount = boardString.Count(c => c == 'R');
+            int bishopCount = boardString.Count(c => c == 'B');
+            int knightCount = boardString.Count(c => c == 'N');
+            int pawnCount = boardString.Count(c => c == 'P');
+
+            int whiteBishopCount = boardString.Count(c => c == 'B' && boardString[boardString.IndexOf(c) - 1] == 'w');
+            int blackBishopCount = boardString.Count(c => c == 'B' && boardString[boardString.IndexOf(c) - 1] == 'b');
+            int whiteKnightCount = boardString.Count(c => c == 'B' && boardString[boardString.IndexOf(c) - 1] == 'w');
+            int blackKnightCount = boardString.Count(c => c == 'B' && boardString[boardString.IndexOf(c) - 1] == 'b');
+
+            bool InsufficiencyBase = kingCount == 2 && queenCount == 0 && rookCount == 0 && pawnCount == 0;
+
+            // King vs King
+            if (InsufficiencyBase && bishopCount == 0 && knightCount == 0)
+            {
+                return true;
+            }
+
+            // King vs King & Bishop    ||    King vs King & Knight
+            if (InsufficiencyBase && (bishopCount == 1 || knightCount == 1))
+            {
+                return true;
+            }
+
+            // King & Bishop    ||    King & Bishop    -    Stricter Chess.com rules to not worry about the tile color bishops are using
+            if (InsufficiencyBase && whiteBishopCount == 1 && blackBishopCount == 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        internal void SortTakenPiecesByValue() 
+        {
+            WhiteTakenPieces = WhiteTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
+            BlackTakenPieces = BlackTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
         }
     }
 }

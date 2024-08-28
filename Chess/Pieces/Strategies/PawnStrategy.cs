@@ -16,10 +16,18 @@ namespace Chess.Pieces.Strategies
 
             if ((firstStraightMove || (secondStraightMove && !piece.HasMoved())) && !board.IsTileOccupied(FistMovePosition) && !board.IsTileOccupied(to))
             {
+                if (to.X == 0 || to.X == 7)
+                {
+                    type = MoveType.Promotion;
+                }
                 return true;
             }
             if (AddPawnCaptureMoves(board, from, to, direction))
             {
+                if (to.X == 0 || to.X == 7)
+                {
+                    type = MoveType.Promotion;
+                }
                 return true;
             }
             if (AddEnPassantMoves(board, piece, from, to))
@@ -27,6 +35,8 @@ namespace Chess.Pieces.Strategies
                 type = MoveType.EnPassant;
                 return true;
             }
+            
+
             return false;
         }
 
