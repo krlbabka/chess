@@ -5,8 +5,9 @@ namespace Chess.Pieces.Strategies
     internal class PawnStrategy : IMovable
     {
         private Move lastMove;
-        public bool CanMove(Board board, Vector from, Vector to)
+        public bool CanMove(Board board, Vector from, Vector to, out MoveType type)
         {
+            type = MoveType.Normal;
             Piece piece = board.GetPieceAt(from);
             int direction = piece.IsWhite ? -1 : 1;
             Vector FistMovePosition = new Vector(from.X + direction, from.Y);
@@ -23,6 +24,7 @@ namespace Chess.Pieces.Strategies
             }
             if (AddEnPassantMoves(board, piece, from, to))
             {
+                type = MoveType.EnPassant;
                 return true;
             }
             return false;

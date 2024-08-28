@@ -164,9 +164,8 @@ namespace Chess
                     }
                 }
             }
-            
             bool check = chessLogic.IsCheck(board, chessLogic.IsWhiteTurn());
-            bool mate = chessLogic.IsMate(board, chessLogic.IsWhiteTurn());
+            bool mate = chessLogic.IsMate(board, !chessLogic.IsWhiteTurn());
             bool stalemate = chessLogic.IsStalemate(board, chessLogic.IsWhiteTurn());
             bool threatCheck = check || mate || stalemate;
             if (threatCheck)
@@ -174,9 +173,7 @@ namespace Chess
                 Vector kingPosition = chessLogic.FindKingPosition(board, chessLogic.IsWhiteTurn());
                 Button button = boardButtons[kingPosition.X, kingPosition.Y];
                 SetButtonColor(button, Color.Red);
-            } 
-
-             
+            }
         }
 
         private void UpdateButtonActions()

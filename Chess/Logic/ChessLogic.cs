@@ -118,51 +118,6 @@ namespace Chess.Logic
             }
         }
 
-        internal bool CanCastle(Board chessboard, bool white, bool queenSide)
-        {
-            return false;
-            int row = white ? 7 : 0;
-            Tile kingTile = chessboard.BoardGrid[row, 4];
-            Tile rookTile = chessboard.BoardGrid[row, queenSide ? 0 : 7];
-
-            bool canKingCastle = chessboard.IsTileOccupied(kingTile) &&
-                   chessboard.GetPieceAt(kingTile).Type == PieceType.King &&
-                   !chessboard.GetPieceAt(kingTile).HasMoved();
-
-            bool canRookCastle = chessboard.IsTileOccupied(rookTile) &&
-                   chessboard.GetPieceAt(rookTile).Type == PieceType.Rook &&
-                   !chessboard.GetPieceAt(rookTile).HasMoved();
-
-            if (!canKingCastle || !canRookCastle)
-                return false;
-
-            if (queenSide)
-                return CanCastleQueenSide(chessboard, white, row);
-
-            return CanCastleKingSide(chessboard, white, row);
-        }
-
-        private bool CanCastleQueenSide(Board board, bool white, int row)
-        {
-            return !IsCheck(board, white) &&
-                   !board.IsTileOccupied(board.BoardGrid[row, 1]) &&
-                   !board.IsTileOccupied(board.BoardGrid[row, 2]) &&
-                   !board.IsTileOccupied(board.BoardGrid[row, 3]) &&
-                   !IsKingUnderThreatOnPath(board, white, new Vector(row, 2));
-        }
-
-        private bool CanCastleKingSide(Board board, bool white, int row)
-        {
-            return !IsCheck(board, white) &&
-                   !board.IsTileOccupied(board.BoardGrid[row, 5]) &&
-                   !board.IsTileOccupied(board.BoardGrid[row, 6]) &&
-                   !IsKingUnderThreatOnPath(board, white, new Vector(row, 5));
-        }
-        private bool IsKingUnderThreatOnPath(Board board, bool white, Vector position)
-        {
-            return PotentialCheckAfterMove(new Vector(white ? 7 : 0, 4), position);
-        }
-
         internal void FindLegalTiles(Board board, Tile CurrentTile, Piece ChessPiece)
         {
             board.ResetLegalMoves();
@@ -197,30 +152,13 @@ namespace Chess.Logic
 
             foreach (Tile tile in board.BoardGrid)
             {
-                if (piece.CanMove(board, currentPosition, tile.Position))
+                if (piece.CanMove(board, currentPosition, tile.Position, out type))
                 {
-                    possibleMoves.Add(new PossibleMove(tile.Position));
+                    possibleMoves.Add(new PossibleMove(tile.Position, type));
                     
                 }
             }
             return possibleMoves;
-            /*
-            if (piece.Type == PieceType.King)
-            {
-                bool canCastleQueenSide = CanCastle(board, piece.IsWhite, true);
-                bool canCastleKingSide = CanCastle(board, piece.IsWhite, false);
-                if (canCastleQueenSide)
-                {
-                    Vector kingTargetPosition = new Vector(piece.IsWhite ? 7 : 0, 2);
-                    possibleMoves.Add(new PossibleMove(kingTargetPosition, MoveType.Castling));
-                }
-                if (canCastleKingSide)
-                {
-                    Vector kingTargetPosition = new Vector(piece.IsWhite ? 7 : 0, 6);
-                    possibleMoves.Add(new PossibleMove(kingTargetPosition, MoveType.Castling));
-                }
-            }
-            */
         }
 
         #endregion

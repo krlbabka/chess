@@ -30,9 +30,9 @@ namespace Chess.Pieces
         }
 
         internal abstract Image GetPieceImage(bool isWhite);
-        public bool CanMove(Board board, Vector from, Vector to)
+        public bool CanMove(Board board, Vector from, Vector to, out MoveType type)
         {
-            return _movable.CanMove(board, from, to);
+            return _movable.CanMove(board, from, to, out type);
         }
         public virtual bool HasMoved() { return false; }
         public virtual bool PieceMoved() { return false; }

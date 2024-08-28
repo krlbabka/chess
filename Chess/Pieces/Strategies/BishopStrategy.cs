@@ -4,8 +4,9 @@ namespace Chess.Pieces.Strategies
 {
     internal class BishopStrategy : IMovable
     {
-        public bool CanMove(Board board, Vector from, Vector to)
+        public bool CanMove(Board board, Vector from, Vector to, out MoveType type)
         {
+            type = MoveType.Normal;
             bool obstacle = ObstacleInPath(board, from, to);
             bool diagonalBool = (Math.Abs(from.X - to.X) == Math.Abs(from.Y - to.Y));
             bool canMoveToTile = board.GetPieceAt(to) == null || board.GetPieceAt(to).IsWhite != board.GetPieceAt(from).IsWhite;
