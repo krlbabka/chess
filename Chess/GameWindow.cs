@@ -1,5 +1,8 @@
 using Chess.HelperClasses;
+using Chess.Logic;
 using Chess.Pieces;
+using System.Diagnostics;
+using System.Xml;
 
 namespace Chess
 {
@@ -161,17 +164,19 @@ namespace Chess
                     }
                 }
             }
-            /*
-            bool threatCheck = chessLogic.IsCheck(board, chessLogic.IsWhiteTurn()) ||
-                chessLogic.IsMate(board, !chessLogic.IsWhiteTurn()) ||
-                chessLogic.IsStalemate(board, chessLogic.IsWhiteTurn());
+            
+            bool check = chessLogic.IsCheck(board, chessLogic.IsWhiteTurn());
+            bool mate = chessLogic.IsMate(board, chessLogic.IsWhiteTurn());
+            bool stalemate = chessLogic.IsStalemate(board, chessLogic.IsWhiteTurn());
+            bool threatCheck = check || mate || stalemate;
             if (threatCheck)
             {
                 Vector kingPosition = chessLogic.FindKingPosition(board, chessLogic.IsWhiteTurn());
                 Button button = boardButtons[kingPosition.X, kingPosition.Y];
                 SetButtonColor(button, Color.Red);
-            }
-            */
+            } 
+
+             
         }
 
         private void UpdateButtonActions()
@@ -206,11 +211,12 @@ namespace Chess
             {
                 chessLogic.MovePiece(board, Current, New);
                 LastMove = New;
+
                 Update();
                 SwitchTurn();
             }
             Update();
-            //CheckGameOver();
+            CheckGameOver();
         }
 
         private void CheckGameOver()

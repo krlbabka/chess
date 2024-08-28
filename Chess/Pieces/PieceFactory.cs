@@ -1,4 +1,6 @@
-﻿namespace Chess.Pieces
+﻿using Chess.Logic;
+
+namespace Chess.Pieces
 {
     internal static class PieceFactory
     {

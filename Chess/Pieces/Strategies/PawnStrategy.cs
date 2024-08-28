@@ -9,10 +9,11 @@ namespace Chess.Pieces.Strategies
         {
             Piece piece = board.GetPieceAt(from);
             int direction = piece.IsWhite ? -1 : 1;
+            Vector FistMovePosition = new Vector(from.X + direction, from.Y);
             bool firstStraightMove = from.Y == to.Y && to.X == from.X + direction;
             bool secondStraightMove = from.Y == to.Y && to.X == from.X + direction * 2;
 
-            if ((firstStraightMove || (secondStraightMove && !piece.HasMoved())) && !board.IsTileOccupied(to))
+            if ((firstStraightMove || (secondStraightMove && !piece.HasMoved())) && !board.IsTileOccupied(FistMovePosition) && !board.IsTileOccupied(to))
             {
                 return true;
             }

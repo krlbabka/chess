@@ -7,7 +7,9 @@ namespace Chess.Pieces.Strategies
         public bool CanMove(Board board, Vector from, Vector to)
         {
             bool obstacle = ObstacleInPath(board, from, to);
-            if ((from.X == to.X || from.Y == to.Y) && !obstacle)
+            bool canMoveToTile = board.GetPieceAt(to) == null || board.GetPieceAt(to).IsWhite != board.GetPieceAt(from).IsWhite;
+
+            if ((from.X == to.X || from.Y == to.Y) && !obstacle && canMoveToTile)
             {
                 return true;
             }

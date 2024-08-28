@@ -7,7 +7,11 @@ namespace Chess.Pieces.Strategies
         public bool CanMove(Board board, Vector from, Vector to)
         {
             bool obstacle = ObstacleInPath(board, from, to);
-            if ((Math.Abs(from.X - to.X) == Math.Abs(from.Y - to.Y)) && !obstacle)
+            bool diagonalBool = (Math.Abs(from.X - to.X) == Math.Abs(from.Y - to.Y));
+            bool canMoveToTile = board.GetPieceAt(to) == null || board.GetPieceAt(to).IsWhite != board.GetPieceAt(from).IsWhite;
+
+
+            if (diagonalBool && !obstacle && canMoveToTile)
             {
                 return true;
             }

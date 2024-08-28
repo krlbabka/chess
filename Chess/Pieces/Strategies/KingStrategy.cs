@@ -1,4 +1,5 @@
 ﻿using Chess.HelperClasses;
+using Chess.Logic;
 
 namespace Chess.Pieces.Strategies
 {
@@ -8,7 +9,9 @@ namespace Chess.Pieces.Strategies
         {
             int distanceX = Math.Abs(from.X - to.X);
             int distanceY = Math.Abs(from.Y - to.Y);
-            return distanceX <= 1 && distanceY <= 1;
+            bool canMoveToTile = board.GetPieceAt(to) == null || board.GetPieceAt(to).IsWhite != board.GetPieceAt(from).IsWhite;
+
+            return distanceX <= 1 && distanceY <= 1 && canMoveToTile;
         }
     }
 }
