@@ -1,18 +1,15 @@
 ﻿using Chess.HelperClasses;
 using Chess.Pieces.Strategies;
+using System.Threading.Tasks.Dataflow;
 
 namespace Chess.Pieces
 {
     internal class Queen : Piece
     {
-        public Queen(bool isWhite) : base(PieceType.Queen, isWhite, new QueenStrategy()) { }
+        const string sourceWhite = "../../../Resources/w_queen.png";
+        const string sourceBlack = "../../../Resources/b_queen.png";
+        public Queen(bool isWhite) : base(PieceType.Queen, isWhite, new QueenStrategy(), isWhite ? sourceWhite : sourceBlack) { }
         public override char Notation => 'Q';
         public override int MaterialValue => 9;
-
-        internal override Image GetPieceImage(bool isWhite)
-        {
-            string source = "../../../Resources/" + (isWhite ? "w_queen.png" : "b_queen.png");
-            return Image.FromFile(source);
-        }
     }
 }

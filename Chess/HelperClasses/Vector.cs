@@ -1,6 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-
-namespace Chess.HelperClasses
+﻿namespace Chess.HelperClasses
 {
     public class Vector
     {

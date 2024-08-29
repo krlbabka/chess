@@ -7,6 +7,8 @@ namespace Chess
     {
         internal PieceType SelectedPieceType { get; private set; }
         bool isWhite;
+        private readonly Color DarkColor = Color.FromArgb(33, 32, 46);
+        private readonly Color LightColor = Color.FromArgb(82, 79, 103);
 
         public PromotionDialog(bool isWhite, Form owner)
         {
@@ -26,6 +28,8 @@ namespace Chess
             FormBorderStyle = FormBorderStyle.None;
             Owner = owner;
             StartPosition = FormStartPosition.CenterParent;
+            Size = new Size(320, 80);
+            BackColor = DarkColor;
         }
 
         private void CreatePromotionButton(string pieceName, PieceType pieceType, int column)
@@ -35,6 +39,9 @@ namespace Chess
                 Tag = pieceType,
                 Dock = DockStyle.Fill,
                 Image = getPieceImage(pieceType),
+                BackColor = LightColor,
+                FlatStyle = FlatStyle.Flat,
+                FlatAppearance = { BorderSize = 0},
             };
             button.Click += PromotionButtonClick;
             ButtonsLayout.Controls.Add(button, column, 0);

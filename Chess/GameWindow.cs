@@ -1,34 +1,41 @@
 using Chess.HelperClasses;
 using Chess.Logic;
 using Chess.Pieces;
-using System.Windows.Forms;
 
 namespace Chess
 {
     public partial class GameWindow : Form
     {
 
-        Button[,]? boardButtons;
-        Board board;
-        ChessLogic chessLogic;
-        Vector ClickedPosition;
-        Vector LastMove;
-        ChessTimer whiteTimer;
-        ChessTimer blackTimer;
+        private Button[,]? _boardButtons;
+        private Board _board;
+        private ChessLogic _chessLogic;
+        private Vector _ClickedPosition;
+        private Vector _LastMove;
+        private ChessTimer _whiteTimer;
+        private ChessTimer _blackTimer;
+
+
+
+        private readonly Color DarkColor = Color.FromArgb(38, 35, 58);
+        private readonly Color LightColor = Color.FromArgb(82, 79, 103);
+        private readonly Color LastMoveColor = Color.FromArgb(196, 167, 231);
+        private readonly Color LegalMoveColor = Color.FromArgb(156, 207, 216);
+        private readonly Color KingInDangerColor = Color.FromArgb(235, 111, 146);
 
         public GameWindow()
         {
-            board = new Board();
-            chessLogic = new ChessLogic(board);
-            chessLogic.OnPromotion += HandlePromotionDialog;
+            _board = new Board();
+            _chessLogic = new ChessLogic(_board);
+            _chessLogic.OnPromotion += HandlePromotionDialog;
             InitializeComponent();
-            board.defaultPosition();
+            _board.DefaultPosition();
             SetupChessboard();
             SetupCoordinateLabels();
-            whiteTimer = new ChessTimer(0, 10, WhiteTimerLabel);
-            blackTimer = new ChessTimer(0, 10, BlackTimerLabel);
-            whiteTimer.OnGameOver += () => GameOver("Black wins on time");
-            blackTimer.OnGameOver += () => GameOver("White wins on time");
+            _whiteTimer = new ChessTimer(5, 0, WhiteTimerLabel);
+            _blackTimer = new ChessTimer(5, 0, BlackTimerLabel);
+            _whiteTimer.OnGameOver += () => GameOver("Black wins on time");
+            _blackTimer.OnGameOver += () => GameOver("White wins on time");
         }
 
         private void GameWindowLoad(object sender, EventArgs e)
@@ -37,7 +44,7 @@ namespace Chess
             DoneMovesTable.WrapContents = false;
             DoneMovesTable.Dock = DockStyle.Fill;
             DoneMovesTable.AutoScroll = true;
-            DoneMovesTable.BackColor = Color.Black;
+            DoneMovesTable.BackColor = DarkColor;
 
             Size = new Size(920, 720);
             ParentGamePanel.Controls.Add(GamePanel);
@@ -102,14 +109,14 @@ namespace Chess
 
         private void SetupChessboard()
         {
-            boardButtons = new Button[Board.BOARD_SIZE, Board.BOARD_SIZE];
+            _boardButtons = new Button[Board.BOARD_SIZE, Board.BOARD_SIZE];
             for (int row = 0; row < Board.BOARD_SIZE; row++)
             {
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
                     Vector currentPosition = new(row, col);
-                    Color tileColor = (currentPosition.X + currentPosition.Y) % 2 == 0 ? Color.White : Color.Black;
-                    boardButtons[currentPosition.X, currentPosition.Y] = new Button
+                    Color tileColor = (currentPosition.X + currentPosition.Y) % 2 == 0 ? LightColor : DarkColor;
+                    _boardButtons[currentPosition.X, currentPosition.Y] = new Button
                     {
                         BackColor = tileColor,
                         Dock = DockStyle.Fill,
@@ -122,6 +129,14 @@ namespace Chess
             UpdateChessboardGUI();
         }
 
+        private void TurnButtonsOff() 
+        {
+            foreach (Button button in _boardButtons) 
+            {
+                button.Enabled = false;
+            }
+        }
+
         private void UpdateChessboard()
         {
             for (int row = 0; row < Board.BOARD_SIZE; row++)
@@ -129,12 +144,12 @@ namespace Chess
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
                     Vector position = new Vector(row, col);
-                    Button button = boardButtons[row, col];
+                    Button button = _boardButtons[row, col];
 
                     button.Click -= ButtonClick;
-                    if (board.IsTileOccupied(position))
+                    if (_board.IsTileOccupied(position))
                     {
-                        if (board.GetPieceAt(position)!.IsWhite == chessLogic.IsWhiteTurn())
+                        if (_board.GetPieceAt(position)!.IsWhite == _chessLogic.IsWhiteTurn)
                         {
                             button.Click += ButtonClick;
                         }
@@ -157,8 +172,8 @@ namespace Chess
             Button button = (Button)sender;
             int rowVar = GamePanel.GetRow(button);
             int colVar = GamePanel.GetColumn(button);
-            ClickedPosition = new Vector(rowVar, colVar);
-            chessLogic.FindLegalTiles(board, board.BoardGrid[rowVar, colVar], board.GetPieceAt(ClickedPosition));
+            _ClickedPosition = new Vector(rowVar, colVar);
+            _chessLogic.FindLegalTiles(_board, _board.BoardGrid[rowVar, colVar], _board.GetPieceAt(_ClickedPosition));
             UpdateChessboardGUI();
             UpdateButtonActions();
         }
@@ -169,14 +184,14 @@ namespace Chess
             int rowVar = GamePanel.GetRow(button);
             int colVar = GamePanel.GetColumn(button);
 
-            MovePiece(ClickedPosition, board.BoardGrid[rowVar, colVar].Position);
+            MovePiece(_ClickedPosition, _board.BoardGrid[rowVar, colVar].Position);
         }
 
         private void LegalMoveResetAction(int rowVar, int colVar)
         {
-            boardButtons[rowVar, colVar].Click += (sender, e) =>
+            _boardButtons[rowVar, colVar].Click += (sender, e) =>
             {
-                board.ResetLegalMoves();
+                _board.ResetLegalMoves();
                 UpdateChessboardGUI();
                 UpdateButtonActions();
             };
@@ -189,61 +204,61 @@ namespace Chess
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
                     Vector position = new(row, col);
-                    Button button = boardButtons[row, col];
-                    if (board.BoardGrid[position.X, position.Y].IsOccupied)
+                    Button button = _boardButtons[row, col];
+                    if (_board.BoardGrid[position.X, position.Y].IsOccupied)
                     {
-                        Piece piece = board.GetPieceAt(position)!;
-                        SetPieceImage(button, piece.GetPieceImage(piece.IsWhite));
+                        Piece piece = _board.GetPieceAt(position)!;
+                        SetPieceImage(button, piece.PieceImage);
                     }
                     else
                     {
                         SetPieceImage(button, null);
                     }
-
-                    // Button highlights
-                    if (!board.BoardGrid[position.X, position.Y].LegalMove)
+                    if (_LastMove != null && position.IsEqual(_LastMove))
                     {
-                        Color btnColor = (position.X + position.Y) % 2 == 0 ? Color.White : Color.Black;
-                        SetButtonColor(button, btnColor);
+                        SetButtonColor(button, LastMoveColor);
+                        continue;
                     }
-                    if (LastMove != null && position.IsEqual(LastMove))
+                    if (_board.BoardGrid[position.X, position.Y].LegalMove)
                     {
-                        SetButtonColor(button, Color.Gray);
+                        SetButtonColor(button, LegalMoveColor);
+                        continue;
                     }
-                    if (board.BoardGrid[position.X, position.Y].LegalMove)
-                    {
-                        SetButtonColor(button, Color.Green);
-                    }
+                    Color btnColor = (position.X + position.Y) % 2 == 0 ? LightColor : DarkColor;
+                    SetButtonColor(button, btnColor);
                 }
             }
-            bool check = chessLogic.IsCheck(board, chessLogic.IsWhiteTurn());
-            bool mate = chessLogic.IsMate(board, !chessLogic.IsWhiteTurn());
-            bool stalemate = chessLogic.IsStalemate(board, chessLogic.IsWhiteTurn());
-            bool threatCheck = check || mate || stalemate;
-            if (threatCheck)
+            
+            bool check = _chessLogic.IsCheck(_board);
+            bool stalemate = _chessLogic.IsStalemate(_board);
+            if (check || stalemate)
             {
-                Vector kingPosition = chessLogic.FindKingPosition(board, chessLogic.IsWhiteTurn());
-                Button button = boardButtons[kingPosition.X, kingPosition.Y];
-                SetButtonColor(button, Color.Red);
+                Vector kingPosition = _chessLogic.FindKingPosition(_board);
+                Button button = _boardButtons[kingPosition.X, kingPosition.Y];
+                SetButtonColor(button, KingInDangerColor);
             }
-            int materialDiff = chessLogic.GetMaterialDifference();
+            UpdateMaterialDifferenceGUI();
+        }
+
+        private void UpdateMaterialDifferenceGUI()
+        {
+            int materialDiff = _chessLogic.GetMaterialDifference();
             if (materialDiff > 0)
             {
-                label1.Text = materialDiff.ToString();
-                label2.Text = " ";
+                BlackPlayerMaterial.Text = materialDiff.ToString();
+                WhitePlayerMaterial.Text = " ";
 
             }
             else if (materialDiff < 0)
             {
-                label1.Text = " ";
-                label2.Text = (-materialDiff).ToString();
+                BlackPlayerMaterial.Text = " ";
+                WhitePlayerMaterial.Text = (-materialDiff).ToString();
             }
             else
             {
-                label1.Text = " ";
-                label2.Text = " ";
+                BlackPlayerMaterial.Text = " ";
+                WhitePlayerMaterial.Text = " ";
             }
-
         }
 
         private void UpdateButtonActions()
@@ -254,14 +269,14 @@ namespace Chess
                 {
                     int rowVar = row;
                     int colVar = col;
-                    if (board.BoardGrid[rowVar, colVar].LegalMove)
+                    if (_board.BoardGrid[rowVar, colVar].LegalMove)
                     {
-                        boardButtons[rowVar, colVar].Click -= ButtonClick;
-                        boardButtons[rowVar, colVar].Click += MoveAction;
+                        _boardButtons[rowVar, colVar].Click -= ButtonClick;
+                        _boardButtons[rowVar, colVar].Click += MoveAction;
                     }
                     else
                     {
-                        boardButtons[rowVar, colVar].Click -= MoveAction;
+                        _boardButtons[rowVar, colVar].Click -= MoveAction;
                     }
                 }
             }
@@ -269,19 +284,22 @@ namespace Chess
 
         private void SwitchTurn()
         {
-            chessLogic.SwitchTurn();
+            _chessLogic.SwitchTurn();
             HandleTimers();
         }
 
         private void MovePiece(Vector Current, Vector New)
         {
-            if (chessLogic.CanMove(Current, New))
+            if (_chessLogic.CanMove(Current, New))
             {
-                chessLogic.MovePiece(board, Current, New);
-                LastMove = New;
+                _chessLogic.MovePiece(_board, Current, New);
+                _LastMove = New;
 
                 Update();
-                DoneMovesTable.Controls.Add(new Label { Text = chessLogic.GetLastMoveNotation().ToString(), ForeColor = Color.White });
+
+                string NotationLabel = _chessLogic.GetLastMoveNotation().ToString();
+                DoneMovesTable.Controls.Add(new Label { Text = NotationLabel, ForeColor = Color.White });
+                
                 SwitchTurn();
             }
             Update();
@@ -290,30 +308,42 @@ namespace Chess
 
         private void HandleTimers() 
         {
-            if (chessLogic.IsWhiteTurn())
+            if (_chessLogic.IsWhiteTurn)
             {
-                blackTimer.Stop();
-                whiteTimer.Start();
+                _blackTimer.Stop();
+                _whiteTimer.Start();
             }
             else
             {
-                whiteTimer.Stop();
-                blackTimer.Start();
+                _whiteTimer.Stop();
+                _blackTimer.Start();
             }
+        }
+        private void StopTimers()
+        {
+            _whiteTimer.Stop();
+            _blackTimer.Stop();
         }
 
         private void CheckGameOver()
         {
-            if (chessLogic.IsMate(board, chessLogic.IsWhiteTurn()))
+            if (_chessLogic.IsMate(_board, _chessLogic.IsWhiteTurn))
             {
+                DoneMovesTable.Controls[DoneMovesTable.Controls.Count -1].Text += "#";
+                TurnButtonsOff();
+                StopTimers();
                 GameOver("Mate");
             }
-            if (chessLogic.IsStalemate(board, chessLogic.IsWhiteTurn()))
+            if (_chessLogic.IsStalemate(_board))
             {
+                TurnButtonsOff();
+                StopTimers();
                 GameOver("Stalemate");
             }
-            if (chessLogic.IsDraw())
+            if (_chessLogic.IsDraw())
             {
+                TurnButtonsOff();
+                StopTimers();
                 GameOver($"Draw");
             }
         }
@@ -322,6 +352,11 @@ namespace Chess
         {
             using (PromotionDialog dialog = new PromotionDialog(isWhite, this))
             {
+                dialog.StartPosition = FormStartPosition.Manual;
+
+                int vertical = isWhite ? Location.Y + (Height - dialog.Height) / 8 + 30 : Location.Y;
+                dialog.Location = new Point(Location.X + (Width - dialog.Width) / 2, vertical);
+
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     onActionSuccess?.Invoke(dialog.SelectedPieceType);

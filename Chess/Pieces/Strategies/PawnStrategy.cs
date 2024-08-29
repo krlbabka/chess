@@ -78,7 +78,7 @@ namespace Chess.Pieces.Strategies
                 if (!lastMove.To.IsEqual(pawnPosition))
                     continue;
 
-                if (!board.AreEnemies(currentPosition, pawnPosition))
+                if (board.IsTileOccupied(pawnPosition) && !board.AreEnemies(currentPosition, pawnPosition))
                     continue;
 
 

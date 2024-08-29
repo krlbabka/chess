@@ -21,9 +21,13 @@ namespace Chess
                 }
             }
         }
-        public int GetBoardSize() => BOARD_SIZE;
+        internal Piece? GetPieceAt(Vector position) => BoardGrid[position.X, position.Y].OccupyingPiece;
+        internal Piece? GetPieceAt(Tile tile) => tile.OccupyingPiece;
+        internal bool IsTileOccupied(Vector position) => BoardGrid[position.X, position.Y].IsOccupied;
+        internal bool IsTileOccupied(Tile tile) => tile.IsOccupied;
+        internal Tile GetTile(Vector position) => BoardGrid[position.X, position.Y];
 
-        public Tile[,] getBoardCopy()
+        public Tile[,] GetBoardCopy()
         {
             Tile[,] copy = new Tile[BOARD_SIZE, BOARD_SIZE];
             for (int row = 0; row < BOARD_SIZE; row++)
@@ -39,8 +43,7 @@ namespace Chess
             }
             return copy;
         }
-
-        internal void defaultPosition()
+        internal void DefaultPosition()
         {
             PieceType[] BackRankPieces = { 
                 PieceType.Rook, 
@@ -64,16 +67,6 @@ namespace Chess
                 BoardGrid[7, col].AddPieceToTile(BackRankPieces[col], true);
             }
         }
-
-        internal Piece? GetPieceAt(Vector position) => BoardGrid[position.X, position.Y].OccupyingPiece;
-        internal Piece? GetPieceAt(Tile tile) => tile.OccupyingPiece;
-        internal bool IsTileOccupied(Vector position) => BoardGrid[position.X, position.Y].IsOccupied;
-        internal bool IsTileOccupied(Tile tile) => tile.IsOccupied;
-        internal bool IsPieceOnTile(Tile tile, PieceType type)
-        {
-            return tile.OccupyingPiece.Type == type;
-        }
-
         internal void ResetLegalMoves()
         {
             foreach (Tile tile in BoardGrid)
@@ -81,12 +74,10 @@ namespace Chess
                 tile.LegalMove = false;
             }
         }
-
         internal bool WithinBounds(Vector position)
         {
             return position.X >= 0 && position.X < BOARD_SIZE && position.Y >= 0 && position.Y < BOARD_SIZE;
         }
-
         internal bool AreEnemies(Vector myPosition, Vector newPosition)
         {
             return GetPieceAt(myPosition).IsWhite != GetPieceAt(newPosition).IsWhite;

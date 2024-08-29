@@ -30,24 +30,23 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameWindow));
             ParentGamePanel = new TableLayoutPanel();
-            label2 = new Label();
+            WhitePlayerMaterial = new Label();
             FileLabels = new TableLayoutPanel();
-            label1 = new Label();
+            BlackPlayerMaterial = new Label();
             RankLabels = new TableLayoutPanel();
             GamePanel = new TableLayoutPanel();
             BlackTimerLabel = new Label();
             WhiteTimerLabel = new Label();
             DoneMovesTable = new FlowLayoutPanel();
-            label3 = new Label();
             ParentGamePanel.SuspendLayout();
             SuspendLayout();
             // 
             // ParentGamePanel
             // 
             resources.ApplyResources(ParentGamePanel, "ParentGamePanel");
-            ParentGamePanel.Controls.Add(label2, 1, 3);
+            ParentGamePanel.Controls.Add(WhitePlayerMaterial, 1, 3);
             ParentGamePanel.Controls.Add(FileLabels, 1, 2);
-            ParentGamePanel.Controls.Add(label1, 1, 0);
+            ParentGamePanel.Controls.Add(BlackPlayerMaterial, 1, 0);
             ParentGamePanel.Controls.Add(RankLabels, 0, 1);
             ParentGamePanel.Controls.Add(GamePanel, 1, 1);
             ParentGamePanel.Controls.Add(BlackTimerLabel, 2, 0);
@@ -55,20 +54,20 @@
             ParentGamePanel.Controls.Add(DoneMovesTable, 2, 1);
             ParentGamePanel.Name = "ParentGamePanel";
             // 
-            // label2
+            // WhitePlayerMaterial
             // 
-            resources.ApplyResources(label2, "label2");
-            label2.Name = "label2";
+            resources.ApplyResources(WhitePlayerMaterial, "WhitePlayerMaterial");
+            WhitePlayerMaterial.Name = "WhitePlayerMaterial";
             // 
             // FileLabels
             // 
             resources.ApplyResources(FileLabels, "FileLabels");
             FileLabels.Name = "FileLabels";
             // 
-            // label1
+            // BlackPlayerMaterial
             // 
-            resources.ApplyResources(label1, "label1");
-            label1.Name = "label1";
+            resources.ApplyResources(BlackPlayerMaterial, "BlackPlayerMaterial");
+            BlackPlayerMaterial.Name = "BlackPlayerMaterial";
             // 
             // RankLabels
             // 
@@ -94,19 +93,14 @@
             // DoneMovesTable
             // 
             resources.ApplyResources(DoneMovesTable, "DoneMovesTable");
+            DoneMovesTable.BackColor = Color.FromArgb(38, 35, 58);
             DoneMovesTable.Name = "DoneMovesTable";
-            // 
-            // label3
-            // 
-            resources.ApplyResources(label3, "label3");
-            label3.Name = "label3";
             // 
             // GameWindow
             // 
             resources.ApplyResources(this, "$this");
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(25, 23, 36);
-            Controls.Add(label3);
             Controls.Add(ParentGamePanel);
             ForeColor = Color.FromArgb(224, 222, 244);
             Name = "GameWindow";
@@ -114,7 +108,6 @@
             ParentGamePanel.ResumeLayout(false);
             ParentGamePanel.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -123,9 +116,8 @@
         private TableLayoutPanel GamePanel;
         private TableLayoutPanel RankLabels;
         private TableLayoutPanel FileLabels;
-        private Label label1;
-        private Label label2;
-        private Label label3;
+        private Label BlackPlayerMaterial;
+        private Label WhitePlayerMaterial;
         private Label BlackTimerLabel;
         private Label WhiteTimerLabel;
         private FlowLayoutPanel DoneMovesTable;

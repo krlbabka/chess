@@ -22,15 +22,20 @@ namespace Chess.Pieces
         public bool IsPromotedPawn { get; set; }
 
         protected IMovable _movable;
+        public Image PieceImage { get; }
 
-        public Piece(PieceType type, bool isWhite, IMovable movable)
+        public Piece(PieceType type, bool isWhite, IMovable movable, string imagePath)
         {
             Type = type;
             IsWhite = isWhite;
             _movable = movable;
+            PieceImage = GetPieceImage(imagePath);
         }
 
-        internal abstract Image GetPieceImage(bool isWhite);
+        internal Image GetPieceImage(string path) 
+        {
+            return Image.FromFile(path);
+        }
         public bool CanMove(Board board, Vector from, Vector to, out MoveType type)
         {
             return _movable.CanMove(board, from, to, out type);

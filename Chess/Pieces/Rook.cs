@@ -1,13 +1,15 @@
 ﻿using Chess.HelperClasses;
 using Chess.Pieces.Strategies;
+using System.Threading.Tasks.Dataflow;
 
 namespace Chess.Pieces
 {
     internal class Rook : Piece
     {
         private bool Moved;
-
-        public Rook(bool isWhite) : base(PieceType.Rook, isWhite, new RookStrategy())
+        const string sourceWhite = "../../../Resources/w_rook.png";
+        const string sourceBlack = "../../../Resources/b_rook.png";
+        public Rook(bool isWhite) : base(PieceType.Rook, isWhite, new RookStrategy(), isWhite ? sourceWhite : sourceBlack)
         {
             Moved = false;
         }
@@ -15,11 +17,5 @@ namespace Chess.Pieces
         public override int MaterialValue => 5;
         public override bool HasMoved() => Moved;
         public override bool PieceMoved() => Moved = true;
-
-        internal override Image GetPieceImage(bool isWhite)
-        {
-            string source = "../../../Resources/" + (isWhite ? "w_rook.png" : "b_rook.png");
-            return Image.FromFile(source);
-        }
     }
 }
