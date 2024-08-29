@@ -147,6 +147,7 @@ namespace Chess
                     Button button = _boardButtons[row, col];
 
                     button.Click -= ButtonClick;
+                    button.Click -= LegalMoveResetAction;
                     if (_board.IsTileOccupied(position))
                     {
                         if (_board.GetPieceAt(position)!.IsWhite == _chessLogic.IsWhiteTurn)
@@ -155,12 +156,12 @@ namespace Chess
                         }
                         else
                         {
-                            LegalMoveResetAction(position.X, position.Y);
+                            button.Click += LegalMoveResetAction;
                         }
                     }
                     else
                     {
-                        LegalMoveResetAction(position.X, position.Y);
+                        button.Click += LegalMoveResetAction;
                     }
                     GamePanel.Controls.Add(button, position.Y, position.X);
                 }
@@ -187,14 +188,11 @@ namespace Chess
             MovePiece(_ClickedPosition, _board.BoardGrid[rowVar, colVar].Position);
         }
 
-        private void LegalMoveResetAction(int rowVar, int colVar)
+        private void LegalMoveResetAction(object? sender, EventArgs e)
         {
-            _boardButtons[rowVar, colVar].Click += (sender, e) =>
-            {
-                _board.ResetLegalMoves();
-                UpdateChessboardGUI();
-                UpdateButtonActions();
-            };
+            _board.ResetLegalMoves();
+            UpdateChessboardGUI();
+            UpdateButtonActions();
         }
 
         private void UpdateChessboardGUI()
@@ -294,8 +292,6 @@ namespace Chess
             {
                 _chessLogic.MovePiece(_board, Current, New);
                 _LastMove = New;
-
-                Update();
 
                 string NotationLabel = _chessLogic.GetLastMoveNotation().ToString();
                 DoneMovesTable.Controls.Add(new Label { Text = NotationLabel, ForeColor = Color.White });
