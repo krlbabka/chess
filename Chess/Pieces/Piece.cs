@@ -19,6 +19,7 @@ namespace Chess.Pieces
         public bool IsWhite { get; set; }
         public abstract char Notation { get; }
         public virtual int MaterialValue { get; }
+        public bool IsPromotedPawn { get; set; }
 
         protected IMovable _movable;
 

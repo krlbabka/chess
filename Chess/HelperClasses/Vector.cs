@@ -1,4 +1,6 @@
-﻿namespace Chess.HelperClasses
+﻿using static System.Net.Mime.MediaTypeNames;
+
+namespace Chess.HelperClasses
 {
     public class Vector
     {
@@ -28,6 +30,16 @@
         public bool IsEqual(Vector Other)
         {
             return X == Other.X && Y == Other.Y;
+        }
+
+        public string GetFile()
+        {
+            return $"{(char)('a' + Y)}";
+        }
+
+        public string GetRank()
+        {
+            return $"{(8 - X)}";
         }
     }
 }

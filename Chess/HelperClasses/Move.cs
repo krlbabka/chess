@@ -7,6 +7,8 @@ namespace Chess.HelperClasses
         public Vector From { get; set; }
         public Vector To { get; set; }
         public Piece MovedPiece { get; set; }
+        public bool isCapture { get; set; }
+        public MoveType moveType { get; set; }
         public Move(Vector from, Vector to, Piece piece)
         {
             From = from;

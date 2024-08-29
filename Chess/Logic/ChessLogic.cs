@@ -67,9 +67,9 @@ namespace Chess.Logic
                 bool isKingMove = CurrentPiece.Type == PieceType.King;
                 bool isRookMove = CurrentPiece.Type == PieceType.Rook;
 
-                if (!simulatingMove)
+                if (!simulatingMove && isCapture)
                 {
-                    if (isCapture)
+                    if (!NewTile.OccupyingPiece.IsPromotedPawn)
                     {
                         if (NewTile.OccupyingPiece!.IsWhite)
                         {
@@ -93,7 +93,7 @@ namespace Chess.Logic
                         FiftyMoveCounter = 0;
                         boardStateCounts.Clear();
                     }
-                    else 
+                    else
                     {
                         FiftyMoveCounter++;
                     }
@@ -106,6 +106,8 @@ namespace Chess.Logic
                     }
                     Moves.Add(move);
                     setLastMove(move);
+                    lastMove.isCapture = isCapture;
+                    lastMove.moveType = NewTile.MoveType;
 
                     HandleSpecialMoveTypes(chessboard, CurrentTile, NewTile);
                 }
@@ -151,8 +153,9 @@ namespace Chess.Logic
                 bool isWhite = board.GetPieceAt(newTile).IsWhite;
                 OnPromotion?.Invoke(board.GetPieceAt(newTile).IsWhite, (pieceType) => 
                 {
-                    board.BoardGrid[newTile.Position.X, newTile.Position.Y].SetEmpty();
-                    board.BoardGrid[newTile.Position.X, newTile.Position.Y].AddPieceToTile(pieceType, isWhite);
+                    newTile.SetEmpty();
+                    newTile.AddPieceToTile(pieceType, isWhite);
+                    newTile.OccupyingPiece!.IsPromotedPawn = true;
                 });
             }
         }
@@ -433,6 +436,38 @@ namespace Chess.Logic
         {
             WhiteTakenPieces = WhiteTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
             BlackTakenPieces = BlackTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
+        }
+
+        internal string GetLastMoveNotation() 
+        {
+            if (lastMove == null)
+            {
+                return "";
+            }
+            string notation = "";
+            Piece piece = lastMove.MovedPiece;
+
+            notation += piece.Notation;
+            if (lastMove.isCapture)
+            {
+                if (lastMove.MovedPiece.Type == PieceType.Pawn)
+                {
+                    notation += lastMove.From.GetFile();
+                }
+                notation += "x";
+            }
+
+            notation += lastMove.To.GetFile() + lastMove.To.GetRank();
+
+            if (lastMove.moveType == MoveType.Castling)
+            {
+                notation = lastMove.To.Y == 2 ? "O-O-O" : "O-O";
+            }
+            else if (lastMove.moveType == MoveType.Promotion)
+            {
+                notation += $"={board.GetPieceAt(lastMove.To).Notation}";
+            }
+            return notation;
         }
     }
 }

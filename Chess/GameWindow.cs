@@ -1,6 +1,7 @@
 using Chess.HelperClasses;
 using Chess.Logic;
 using Chess.Pieces;
+using System.Windows.Forms;
 
 namespace Chess
 {
@@ -12,6 +13,8 @@ namespace Chess
         ChessLogic chessLogic;
         Vector ClickedPosition;
         Vector LastMove;
+        ChessTimer whiteTimer;
+        ChessTimer blackTimer;
 
         public GameWindow()
         {
@@ -22,16 +25,26 @@ namespace Chess
             board.defaultPosition();
             SetupChessboard();
             SetupCoordinateLabels();
+            whiteTimer = new ChessTimer(0, 10, WhiteTimerLabel);
+            blackTimer = new ChessTimer(0, 10, BlackTimerLabel);
+            whiteTimer.OnGameOver += () => GameOver("Black wins on time");
+            blackTimer.OnGameOver += () => GameOver("White wins on time");
         }
 
         private void GameWindowLoad(object sender, EventArgs e)
         {
+            DoneMovesTable.FlowDirection = FlowDirection.TopDown;
+            DoneMovesTable.WrapContents = false;
+            DoneMovesTable.Dock = DockStyle.Fill;
+            DoneMovesTable.AutoScroll = true;
+            DoneMovesTable.BackColor = Color.Black;
+
             Size = new Size(920, 720);
             ParentGamePanel.Controls.Add(GamePanel);
             ParentGamePanel.Dock = DockStyle.None;
             ParentGamePanel.Top = 35;
             ParentGamePanel.Left = 35;
-            ParentGamePanel.Size = new Size(620, 620);
+            ParentGamePanel.Size = new Size(700, 620);
 
             GamePanel.Dock = DockStyle.Fill;
             GamePanel.Size = new Size(600, 600);
@@ -45,6 +58,7 @@ namespace Chess
         {
             Application.Exit();
         }
+
         private void SetupCoordinateLabels()
         {
             Label[] rowLabels = new Label[Board.BOARD_SIZE];
@@ -256,6 +270,7 @@ namespace Chess
         private void SwitchTurn()
         {
             chessLogic.SwitchTurn();
+            HandleTimers();
         }
 
         private void MovePiece(Vector Current, Vector New)
@@ -266,10 +281,25 @@ namespace Chess
                 LastMove = New;
 
                 Update();
+                DoneMovesTable.Controls.Add(new Label { Text = chessLogic.GetLastMoveNotation().ToString(), ForeColor = Color.White });
                 SwitchTurn();
             }
             Update();
             CheckGameOver();
+        }
+
+        private void HandleTimers() 
+        {
+            if (chessLogic.IsWhiteTurn())
+            {
+                blackTimer.Stop();
+                whiteTimer.Start();
+            }
+            else
+            {
+                whiteTimer.Stop();
+                blackTimer.Start();
+            }
         }
 
         private void CheckGameOver()
