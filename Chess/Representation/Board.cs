@@ -1,7 +1,7 @@
 ﻿using Chess.HelperClasses;
 using Chess.Pieces;
 
-namespace Chess
+namespace Chess.Representation
 {
     internal class Board
     {
@@ -45,15 +45,15 @@ namespace Chess
         }
         internal void SetDefaultBoardPosition()
         {
-            PieceType[] BackRankPieces = { 
-                PieceType.Rook, 
-                PieceType.Knight, 
-                PieceType.Bishop, 
-                PieceType.Queen, 
+            PieceType[] BackRankPieces = {
+                PieceType.Rook,
+                PieceType.Knight,
+                PieceType.Bishop,
+                PieceType.Queen,
                 PieceType.King,
-                PieceType.Bishop, 
-                PieceType.Knight, 
-                PieceType.Rook 
+                PieceType.Bishop,
+                PieceType.Knight,
+                PieceType.Rook
             };
             for (int col = 0; col < BOARD_SIZE; col++)
             {

@@ -2,18 +2,20 @@
 
 ## Project Hierarchy
 
-- [root folder](#classes-in-the-root-folder)
-  - Classes for tile and board representation and GUI handling classes.
+- [Representation](#representation)
+  - Classes for tile and board representation.
+- [GUI](#gui)
+  - GUI handling classes.
 - [HelperClasses](#helper-classes)
   - Classes that used throughout the project for ease of use.
 - [Logic](#logic)
-  - Classes that handle core chess logic
+  - Classes that handle core chess logic.
 - [Pieces](#pieces)
   - Piece classes and piece strategy classes based on the strategy design pattern.
 - Resources
   - Contains the images used.
 
-### Classes in the root folder
+### Representation
 
 #### Tile.cs
 
@@ -52,6 +54,8 @@ Methods:
 - `WithinBounds` - whether the position is on the board
 - `AreEnemies` - takes two pieces and returns true if they are a different color
 
+### GUI
+
 #### GameWindow.cs
 
 Handles the GUI updates and the communication between chess logic and GUI.
@@ -79,11 +83,11 @@ Methods:
 
 #### PromotionDialog.cs
 
-Form for a pop up dialog on pawn promotion;
+Form for a pop up dialog on pawn promotion.
 
 #### GameOverDialog.cs
 
-Form for a pop up dialog on game end;
+Form for a pop up dialog on game end.
 
 ### Helper Classes
 

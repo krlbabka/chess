@@ -1,5 +1,6 @@
 ﻿using Chess.HelperClasses;
 using Chess.Pieces;
+using Chess.Representation;
 
 namespace Chess.Logic
 {

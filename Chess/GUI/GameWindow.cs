@@ -1,6 +1,7 @@
 using Chess.HelperClasses;
 using Chess.Logic;
 using Chess.Pieces;
+using Chess.Representation;
 
 namespace Chess
 {
@@ -21,7 +22,7 @@ namespace Chess
         private readonly Color LegalMoveColor = Color.FromArgb(156, 207, 216);
         private readonly Color KingInDangerColor = Color.FromArgb(235, 111, 146);
 
-        private bool _pieceClicked;
+        private Vector _pieceClicked;
 
         public GameWindow()
         {
@@ -34,6 +35,7 @@ namespace Chess
             _blackTimer = new ChessTimer(5, 0, BlackTimerLabel);
             _whiteTimer.OnGameOver += () => HandleGameOverDialog("Black wins on time");
             _blackTimer.OnGameOver += () => HandleGameOverDialog("White wins on time");
+            _pieceClicked = new Vector(-1, -1);
         }
 
         private void GameWindowLoad(object sender, EventArgs e)
@@ -163,38 +165,35 @@ namespace Chess
                 {
                     Vector position = new Vector(row, col);
                     Button button = _boardButtons![row, col];
-
-                    button.Click -= ButtonClick;
-                    button.Click -= MoveAction;
-                    button.Click -= LegalMoveResetAction;
-
-                    if (_board.IsTileOccupied(position))
-                    {
-                        if (_board.GetPieceAt(position)!.IsWhite == _chessLogic.IsWhiteTurn)
-                        {
-                            button.Click += ButtonClick;
-                        }
-                        else
-                        {
-                            button.Click += LegalMoveResetAction;
-                        }
-                    }
-                    else
-                    {
-                        button.Click += LegalMoveResetAction;
-                    }
-                    UpdateButtonActions(row, col, button);
+                    UpdateButtonActions(position, button);
                     GamePanel.Controls.Add(button, position.Y, position.X);
                 }
             }
         }
 
-        private void UpdateButtonActions(int row, int col, Button button)
+        private void UpdateButtonActions(Vector position, Button button)
         {
-            
-            if (_board.BoardGrid[row, col].LegalMove)
+            button.Click -= ValidTileClick;
+            button.Click -= MoveAction;
+            button.Click -= LegalMoveResetAction;
+            if (_board.IsTileOccupied(position))
             {
-                button.Click -= ButtonClick;
+                if (_board.GetPieceAt(position)!.IsWhite == _chessLogic.IsWhiteTurn)
+                {
+                    button.Click += ValidTileClick;
+                }
+                else
+                {
+                    button.Click += LegalMoveResetAction;
+                }
+            }
+            else
+            {
+                button.Click += LegalMoveResetAction;
+            }
+            if (_board.BoardGrid[position.X, position.Y].LegalMove)
+            {
+                button.Click -= ValidTileClick;
                 button.Click += MoveAction;
             }
             else
@@ -203,18 +202,18 @@ namespace Chess
             }
         }
 
-        private void ButtonClick(object sender, EventArgs e)
+        private void ValidTileClick(object sender, EventArgs e)
         {
-            if (!_pieceClicked)
+            Button button = (Button)sender;
+            int rowVar = GamePanel.GetRow(button);
+            int colVar = GamePanel.GetColumn(button);
+            if (!_pieceClicked.IsEqual(new Vector(rowVar, colVar)))
             {
-                Button button = (Button)sender;
-                int rowVar = GamePanel.GetRow(button);
-                int colVar = GamePanel.GetColumn(button);
                 _ClickedPosition = new Vector(rowVar, colVar);
                 _chessLogic.FindLegalTiles(_board, _board.BoardGrid[rowVar, colVar], _board.GetPieceAt(_ClickedPosition)!);
                 UpdateChessboard();
                 UpdateChessboardGUI();
-                _pieceClicked = true;
+                _pieceClicked = _ClickedPosition;
             }
         }
 
@@ -225,7 +224,7 @@ namespace Chess
             int colVar = GamePanel.GetColumn(button);
 
             MovePiece(_ClickedPosition!, _board.BoardGrid[rowVar, colVar].Position);
-            _pieceClicked = false;
+            _pieceClicked = _ClickedPosition;
         }
 
         private void LegalMoveResetAction(object? sender, EventArgs e)
@@ -233,7 +232,7 @@ namespace Chess
             _board.ResetLegalMoves();
             UpdateChessboard();
             UpdateChessboardGUI();
-            _pieceClicked = false;
+            _pieceClicked = _ClickedPosition;
         }
 
         private void UpdateChessboardGUI()
@@ -474,7 +473,7 @@ namespace Chess
 
             _LastMove = null;
             _ClickedPosition = null;
-            _pieceClicked = false;
+            _pieceClicked = null;
 
             GeneralUpdate();
             SetAllButtonStates(true);

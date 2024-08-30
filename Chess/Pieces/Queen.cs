@@ -1,5 +1,4 @@
-﻿using Chess.HelperClasses;
-using Chess.Pieces.Strategies;
+﻿using Chess.Pieces.Strategies;
 
 namespace Chess.Pieces
 {

@@ -1,12 +1,11 @@
 ﻿using Chess.HelperClasses;
-using Chess.Logic;
 using Chess.Pieces;
 
-namespace Chess
+namespace Chess.Representation
 {
     internal class Tile
     {
-        public Vector Position { get; set;}
+        public Vector Position { get; set; }
         public bool IsOccupied { get; set; }
         public bool LegalMove { get; set; }
         public MoveType MoveType { get; set; }

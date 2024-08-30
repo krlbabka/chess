@@ -27,6 +27,10 @@
 
         public bool IsEqual(Vector Other)
         {
+            if (Other == null)
+            {
+                return false;
+            }
             return X == Other.X && Y == Other.Y;
         }
 

@@ -1,6 +1,6 @@
-﻿
-using Chess.HelperClasses;
+﻿using Chess.HelperClasses;
 using Chess.Pieces;
+using Chess.Representation;
 using System.Text;
 
 namespace Chess.Logic
