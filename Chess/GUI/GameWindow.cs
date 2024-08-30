@@ -33,15 +33,9 @@ namespace Chess
             _board.SetDefaultBoardPosition();
             _whiteTimer = new ChessTimer(5, 0, WhiteTimerLabel);
             _whiteTimer.OnGameOver += () => HandleGameOverDialog("Black wins on time");
-            WhiteTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
-            WhiteTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
-            WhiteTimerLabel.Dock = DockStyle.Fill;
             _blackTimer = new ChessTimer(5, 0, BlackTimerLabel);
             _blackTimer.OnGameOver += () => HandleGameOverDialog("White wins on time");
             _pieceClicked = new Vector(-1, -1);
-            BlackTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
-            BlackTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
-            BlackTimerLabel.Dock = DockStyle.Fill;
         }
 
         private void GameWindowLoad(object sender, EventArgs e)
@@ -66,6 +60,21 @@ namespace Chess
             SetupCoordinateLabels();
             SetupTakenPiecesPanels();
             UpdateChessboard();
+
+
+            WhiteTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
+            WhiteTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
+            WhiteTimerLabel.Dock = DockStyle.Fill;
+
+            BlackTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
+            BlackTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
+            BlackTimerLabel.Dock = DockStyle.Fill;
+
+            WhitePlayerMaterial.Font = new Font("Verdana", 20);
+            WhitePlayerMaterial.Dock = DockStyle.Fill;
+            BlackPlayerMaterial.Font = new Font("Verdana", 20);
+            BlackPlayerMaterial.Dock = DockStyle.Fill;
+
             FormClosing += (sender, e) => GameWindowClosing();
         }
 

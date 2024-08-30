@@ -9,6 +9,8 @@ If a game is declared as over for whatever reason (mate, stalemate, draw, time o
 
 Then you can choose if you want to play again, or exit the application.
 
+In the left corner of the screen you can see a material value written for the player that's leading. Above or below the chessboard are displayed pieces that were taken already and on the right are player specific timers and a list of moves written in algebraic notation.
+
 Other relevant screenshots:
 
 Move preview:
