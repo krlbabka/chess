@@ -13,7 +13,7 @@
 - Resources
   - Contains the images used.
 
-### Classes in the
+### Classes in the root folder
 
 #### Tile.cs
 
