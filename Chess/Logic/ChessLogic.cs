@@ -9,10 +9,9 @@ namespace Chess.Logic
         private GameStateHandler _gameStateHandler;
         private MovementHandler _movementHandler;
         private bool _whiteTurn;
-        private Move _lastMove;
+        private Move? _lastMove;
 
-
-        public event Action<bool, Action<PieceType>> OnPromotion;
+        public event Action<bool, Action<PieceType>>? OnPromotion;
 
         public ChessLogic(Board board)
         {
@@ -32,23 +31,27 @@ namespace Chess.Logic
             _whiteTurn = true;
         }
 
+        internal void setLastMove(Move move) => _lastMove = move;
+        internal bool IsWhiteTurn => _whiteTurn;
+        internal void SwitchTurn() => _whiteTurn = !_whiteTurn;
+
+        // Movement Handler Classes
         internal List<Piece> WhiteTakenPieces => _movementHandler.WhiteTakenPieces;
         internal List<Piece> BlackTakenPieces => _movementHandler.BlackTakenPieces;
         internal void SortTakenPieces() => _movementHandler.SortTakenPieces();
-        public void setLastMove(Move move) => _lastMove = move;
-        internal bool IsWhiteTurn => _whiteTurn;
-        internal void SwitchTurn() => _whiteTurn = !_whiteTurn;
         internal void FindLegalTiles(Board board, Tile currentTile, Piece chessPiece) => _movementHandler.FindLegalTiles(board, currentTile, chessPiece);
         internal bool CanMove(Vector from, Vector to) => _movementHandler.CanMove(from, to);
         internal void MovePiece(Board board, Vector from, Vector to) => _movementHandler.MovePiece(board, from, to);
+        internal int GetMaterialDifference() => _movementHandler.MaterialDifference;
+        internal void HandlePromotion(bool isWhite, Action<PieceType> type) => OnPromotion?.Invoke(isWhite, type);
+
+
         internal Vector FindKingPosition(Board board) => _gameStateHandler.FindKingPosition(board, _whiteTurn);
         internal bool IsCheck(Board board) => _gameStateHandler.IsCheck(board, _whiteTurn);
         internal void IsCheck(Board board, Action<bool> onSuccess) => onSuccess?.Invoke(_gameStateHandler.IsCheck(board, _whiteTurn));
         internal bool IsMate(Board board, bool whiteTurn) => _gameStateHandler.IsMate(board, whiteTurn);
         internal bool IsStalemate(Board board) => _gameStateHandler.IsStalemate(board, _whiteTurn);
         internal bool IsDraw() => _gameStateHandler.IsDraw(_board);
-        internal int GetMaterialDifference() => _movementHandler.MaterialDifference;
-        internal void HandlePromotion(bool isWhite, Action<PieceType> type) => OnPromotion?.Invoke(isWhite, type);
         internal void PotentialCheckAfterMove(Vector from, Vector to, Action<bool> onSuccess)
         {
             Board PotentialBoard = new()
@@ -56,7 +59,7 @@ namespace Chess.Logic
                 BoardGrid = _board.GetBoardCopy()
             };
 
-            if (PotentialBoard.IsTileOccupied(to) && PotentialBoard.GetPieceAt(to).Type == PieceType.King)
+            if (PotentialBoard.IsTileOccupied(to) && PotentialBoard.GetPieceAt(to)!.Type == PieceType.King)
             {
                 onSuccess?.Invoke(true);
             }
@@ -92,7 +95,7 @@ namespace Chess.Logic
             }
             else if (_lastMove.moveType == MoveType.Promotion)
             {
-                notation += $"={_board.GetPieceAt(_lastMove.To).Notation}";
+                notation += $"={_board.GetPieceAt(_lastMove.To)!.Notation}";
             }
             return notation;
         }

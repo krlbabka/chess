@@ -8,7 +8,7 @@ namespace Chess.Pieces.Strategies
         {
             type = MoveType.Normal;
             bool obstacle = ObstacleInPath(board, from, to);
-            bool canMoveToTile = board.GetPieceAt(to) == null || board.GetPieceAt(to).IsWhite != board.GetPieceAt(from).IsWhite;
+            bool canMoveToTile = board.GetPieceAt(to) == null || board.AreEnemies(from, to);
 
             if ((from.X == to.X || from.Y == to.Y) && !obstacle && canMoveToTile)
             {

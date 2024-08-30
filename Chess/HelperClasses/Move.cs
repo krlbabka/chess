@@ -2,6 +2,14 @@
 
 namespace Chess.HelperClasses
 {
+    public enum MoveType
+    {
+        Normal,
+        EnPassant,
+        Castling,
+        Promotion
+    }
+    
     internal class Move
     {
         public Vector From { get; set; }
@@ -14,11 +22,6 @@ namespace Chess.HelperClasses
             From = from;
             To = to;
             MovedPiece = piece;
-        }
-
-        public bool IsEqual(Move other)
-        {
-            return From.IsEqual(other.From) && To.IsEqual(other.To);
         }
     }
 }

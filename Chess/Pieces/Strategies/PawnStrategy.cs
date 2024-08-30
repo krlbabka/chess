@@ -4,11 +4,11 @@ namespace Chess.Pieces.Strategies
 {
     internal class PawnStrategy : IMovable
     {
-        private Move lastMove;
+        private Move? lastMove;
         public bool CanMove(Board board, Vector from, Vector to, out MoveType type)
         {
             type = MoveType.Normal;
-            Piece piece = board.GetPieceAt(from);
+            Piece piece = board.GetPieceAt(from)!;
             int direction = piece.IsWhite ? -1 : 1;
             Vector FistMovePosition = new Vector(from.X + direction, from.Y);
             bool firstStraightMove = from.Y == to.Y && to.X == from.X + direction;

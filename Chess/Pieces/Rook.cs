@@ -1,6 +1,4 @@
-﻿using Chess.HelperClasses;
-using Chess.Pieces.Strategies;
-using System.Threading.Tasks.Dataflow;
+﻿using Chess.Pieces.Strategies;
 
 namespace Chess.Pieces
 {

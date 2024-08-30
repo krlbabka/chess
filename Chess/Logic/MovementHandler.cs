@@ -1,7 +1,5 @@
 ﻿using Chess.HelperClasses;
 using Chess.Pieces;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 
 namespace Chess.Logic
 {
@@ -105,7 +103,7 @@ namespace Chess.Logic
         {
             if (isCapture)
             {
-                int pieceValue = capturedPiece.MaterialValue;
+                int pieceValue = capturedPiece!.MaterialValue;
 
                 if (capturedPiece.IsWhite)
                 {
@@ -120,16 +118,16 @@ namespace Chess.Logic
             {
                 if (tile.Position.X == 0)
                 {
-                    _materialDifference -= (tile.OccupyingPiece.MaterialValue - 1);
+                    _materialDifference -= (tile.OccupyingPiece!.MaterialValue - 1);
                 }
                 else if (tile.Position.X == 7)
                 {
-                    _materialDifference += (tile.OccupyingPiece.MaterialValue - 1);
+                    _materialDifference += tile.OccupyingPiece!.MaterialValue - 1;
                 }
             }
             if (tile.MoveType == MoveType.EnPassant)
             {
-                _materialDifference += capturedPiece.IsWhite ? 1 : -1;
+                _materialDifference += capturedPiece!.IsWhite ? 1 : -1;
             }
         }
 
@@ -191,7 +189,7 @@ namespace Chess.Logic
         {
             Vector aboveOrBelowNewTile = board.GetPieceAt(tile)!.IsWhite ? new Vector(1, 0) : new Vector(-1, 0);
             Vector pieceToDeletePosition = tile.Position + aboveOrBelowNewTile;
-            board.BoardGrid[pieceToDeletePosition.X, pieceToDeletePosition.Y].SetEmpty();
+            board.BoardGrid[pieceToDeletePosition.X, pieceToDeletePosition.Y].RemoveCurrentPiece();
         }
 
         private void HandleCastling(Board board, Tile tile) 
@@ -226,16 +224,16 @@ namespace Chess.Logic
             bool isWhite = board.GetPieceAt(tile)!.IsWhite;
             if (isWhite)
             {
-                _whiteTakenPieces.Add(board.GetPieceAt(tile));
+                _whiteTakenPieces.Add(board.GetPieceAt(tile)!);
             }
             else
             {
-                _blackTakenPieces.Add(board.GetPieceAt(tile));
+                _blackTakenPieces.Add(board.GetPieceAt(tile)!);
             }
             OnPromotion?.Invoke(isWhite, (pieceType) =>
             {
-                tile.SetEmpty();
-                tile.AddPieceToTile(pieceType, isWhite);
+                tile.RemoveCurrentPiece();
+                tile.CreatePiece(pieceType, isWhite);
                 tile.OccupyingPiece!.IsPromotedPawn = true;
             });
         }
@@ -244,17 +242,17 @@ namespace Chess.Logic
         {
             board.ResetLegalMoves();
             Vector position = CurrentTile.Position;
-            List<PossibleMove>? possibleMoves = GetPossibleMoves(board, ChessPiece, position);
-            foreach (PossibleMove possibleMove in possibleMoves)
+            List<Move>? possibleMoves = GetPossibleMoves(board, ChessPiece, position);
+            foreach (Move possibleMove in possibleMoves)
             {
                 if (possibleMove.moveType == MoveType.Castling)
                 {
-                    if (PotentialCastleCheck(board, position, possibleMove.vector, ChessPiece))
+                    if (PotentialCastleCheck(board, position, possibleMove.To, ChessPiece))
                     {
                         continue;
                     }
                 }
-                Vector tileVector = possibleMove.vector;
+                Vector tileVector = possibleMove.To;
                 if (board.WithinBounds(tileVector))
                 {
                     if (TileNotValid(board, position, tileVector))
@@ -295,9 +293,9 @@ namespace Chess.Logic
             return false;
         }
 
-        internal List<PossibleMove> GetPossibleMoves(Board board, Piece piece, Vector currentPosition)
+        internal List<Move> GetPossibleMoves(Board board, Piece piece, Vector currentPosition)
         {
-            List<PossibleMove> possibleMoves = new List<PossibleMove>();
+            List<Move> possibleMoves = new List<Move>();
             
             if (piece.Type == PieceType.Pawn) piece.SetLastMove(_lastMove!);
 
@@ -307,22 +305,24 @@ namespace Chess.Logic
             {
                 if (piece.CanMove(board, currentPosition, tile.Position, out type))
                 {
-                    possibleMoves.Add(new PossibleMove(tile.Position, type));
+                    Move move = new Move(currentPosition, tile.Position, piece);
+                    possibleMoves.Add(move);
+                    move.moveType = type;
 
                 }
             }
             return possibleMoves;
         }
 
-        internal void GetPossibleMoves(Board board, Piece piece, Vector position, Action<List<PossibleMove>> possibleMoves) 
+        internal void GetPossibleMoves(Board board, Piece piece, Vector position, Action<List<Move>> possibleMoves) 
         {
             possibleMoves?.Invoke(GetPossibleMoves(board, piece, position));
         }
 
         private void UpdateTilesOnMove(Tile from, Tile to) 
         {
-            to.SetOccupyingPiece(from.OccupyingPiece!);
-            from.SetEmpty();
+            to.SetNewPiece(from.OccupyingPiece!);
+            from.RemoveCurrentPiece();
         }
     }
 }

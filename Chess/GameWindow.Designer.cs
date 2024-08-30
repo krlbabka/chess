@@ -38,8 +38,8 @@
             DoneMovesTable = new FlowLayoutPanel();
             WhitePlayerMaterial = new Label();
             BlackPlayerMaterial = new Label();
-            _whiteTakenPiecesPanel = new FlowLayoutPanel();
             _blackTakenPiecesPanel = new FlowLayoutPanel();
+            _whiteTakenPiecesPanel = new FlowLayoutPanel();
             ParentGamePanel.SuspendLayout();
             SuspendLayout();
             // 
@@ -55,7 +55,7 @@
             ParentGamePanel.Controls.Add(WhitePlayerMaterial, 0, 3);
             ParentGamePanel.Controls.Add(BlackPlayerMaterial, 0, 0);
             ParentGamePanel.Controls.Add(_blackTakenPiecesPanel, 1, 3);
-            ParentGamePanel.Controls.Add(_whiteTakenPiecesPanel, 1, 0);
+            ParentGamePanel.Controls.Add(_whiteTakenPiecesPanel, 0, 0);
             ParentGamePanel.Name = "ParentGamePanel";
             // 
             // FileLabels
@@ -100,15 +100,15 @@
             resources.ApplyResources(BlackPlayerMaterial, "BlackPlayerMaterial");
             BlackPlayerMaterial.Name = "BlackPlayerMaterial";
             // 
-            // _whiteTakenPiecesPanel
-            // 
-            resources.ApplyResources(_whiteTakenPiecesPanel, "_whiteTakenPiecesPanel");
-            _whiteTakenPiecesPanel.Name = "_whiteTakenPiecesPanel";
-            // 
             // _blackTakenPiecesPanel
             // 
             resources.ApplyResources(_blackTakenPiecesPanel, "_blackTakenPiecesPanel");
             _blackTakenPiecesPanel.Name = "_blackTakenPiecesPanel";
+            // 
+            // _whiteTakenPiecesPanel
+            // 
+            resources.ApplyResources(_whiteTakenPiecesPanel, "_whiteTakenPiecesPanel");
+            _whiteTakenPiecesPanel.Name = "_whiteTakenPiecesPanel";
             // 
             // GameWindow
             // 

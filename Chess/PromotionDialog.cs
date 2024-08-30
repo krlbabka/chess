@@ -1,5 +1,4 @@
 ﻿using Chess.Pieces;
-using System.Windows.Forms;
 
 namespace Chess
 {
@@ -43,11 +42,11 @@ namespace Chess
                 FlatStyle = FlatStyle.Flat,
                 FlatAppearance = { BorderSize = 0},
             };
-            button.Click += PromotionButtonClick;
+            button.Click += PromotionButtonClick!;
             ButtonsLayout.Controls.Add(button, column, 0);
         }
 
-        private Image getPieceImage(PieceType pieceType)
+        private Image? getPieceImage(PieceType pieceType)
         {
             switch (pieceType)
             {
@@ -67,7 +66,7 @@ namespace Chess
         private void PromotionButtonClick(object sender, EventArgs e)
         {
             Button button = (Button)sender;
-            SelectedPieceType = (PieceType)button.Tag;
+            SelectedPieceType = (PieceType)button.Tag!;
             DialogResult = DialogResult.OK;
             Close();
         }

@@ -21,19 +21,19 @@ namespace Chess
             MoveType = moveType;
         }
 
-        internal void AddPieceToTile(PieceType type, bool isWhite)
+        internal void CreatePiece(PieceType type, bool isWhite)
         {
             OccupyingPiece = PieceFactory.CreatePiece(type, isWhite);
             IsOccupied = true;
         }
 
-        internal void SetEmpty()
+        internal void RemoveCurrentPiece()
         {
             IsOccupied = false;
             OccupyingPiece = null;
         }
 
-        public void SetOccupyingPiece(Piece piece)
+        public void SetNewPiece(Piece piece)
         {
             OccupyingPiece = piece;
             IsOccupied = true;

@@ -37,13 +37,13 @@ namespace Chess
                     copy[row, col] = new Tile(new Vector(row, col));
                     if (BoardGrid[row, col].IsOccupied)
                     {
-                        copy[row, col].AddPieceToTile(BoardGrid[row, col].OccupyingPiece.Type, BoardGrid[row, col].OccupyingPiece.IsWhite);
+                        copy[row, col].CreatePiece(BoardGrid[row, col].OccupyingPiece!.Type, BoardGrid[row, col].OccupyingPiece!.IsWhite);
                     }
                 }
             }
             return copy;
         }
-        internal void DefaultPosition()
+        internal void SetDefaultBoardPosition()
         {
             PieceType[] BackRankPieces = { 
                 PieceType.Rook, 
@@ -57,14 +57,14 @@ namespace Chess
             };
             for (int col = 0; col < BOARD_SIZE; col++)
             {
-                BoardGrid[0, col].AddPieceToTile(BackRankPieces[col], false);
-                BoardGrid[1, col].AddPieceToTile(PieceType.Pawn, false);
+                BoardGrid[0, col].CreatePiece(BackRankPieces[col], false);
+                BoardGrid[1, col].CreatePiece(PieceType.Pawn, false);
                 for (int row = 2; row <= 5; row++)
                 {
-                    BoardGrid[row, col].SetEmpty();
+                    BoardGrid[row, col].RemoveCurrentPiece();
                 }
-                BoardGrid[6, col].AddPieceToTile(PieceType.Pawn, true);
-                BoardGrid[7, col].AddPieceToTile(BackRankPieces[col], true);
+                BoardGrid[6, col].CreatePiece(PieceType.Pawn, true);
+                BoardGrid[7, col].CreatePiece(BackRankPieces[col], true);
             }
         }
         internal void ResetLegalMoves()
@@ -80,7 +80,7 @@ namespace Chess
         }
         internal bool AreEnemies(Vector myPosition, Vector newPosition)
         {
-            return GetPieceAt(myPosition).IsWhite != GetPieceAt(newPosition).IsWhite;
+            return GetPieceAt(myPosition)!.IsWhite != GetPieceAt(newPosition)!.IsWhite;
         }
     }
 }

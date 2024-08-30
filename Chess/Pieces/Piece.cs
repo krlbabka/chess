@@ -32,7 +32,7 @@ namespace Chess.Pieces
             PieceImage = GetPieceImage(imagePath);
         }
 
-        internal Image GetPieceImage(string path) 
+        internal static Image GetPieceImage(string path)
         {
             return Image.FromFile(path);
         }

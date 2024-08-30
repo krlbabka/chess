@@ -9,15 +9,17 @@ namespace Chess.HelperClasses
         private int sec;
         private Label label;
 
-        public event Action OnGameOver;
+        public event Action? OnGameOver;
 
         public ChessTimer(int minutes, int seconds, Label label)
         {
             min = minutes;
             sec = seconds;
-            timer = new System.Timers.Timer();
-            timer.Interval = 1000;
-            timer.Elapsed += OnTimeEvent;
+            timer = new System.Timers.Timer
+            {
+                Interval = 1000
+            };
+            timer.Elapsed += OnTimeEvent!;
             this.label = label;
         }
 

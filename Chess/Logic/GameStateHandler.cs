@@ -9,14 +9,14 @@ namespace Chess.Logic
     {
 
         public event Action<Vector, Vector, Action<bool>>? OnPotentialCheck;
-        public event Action<Board, Piece, Vector, Action<List<PossibleMove>>>? OnPossibleMovesRequest;
+        public event Action<Board, Piece, Vector, Action<List<Move>>>? OnPossibleMovesRequest;
 
-        private Dictionary<string, int> boardStateCounts = new();
-        private int FiftyMoveCounter;
+        private Dictionary<string, int> _boardStateCounts = new();
+        private int _fiftyMoveCounter;
 
-        private List<PossibleMove> GetPossibleMoves(Board board, Piece piece, Vector position)
+        private List<Move> GetPossibleMoves(Board board, Piece piece, Vector position)
         {
-            List<PossibleMove> possibleMoves = new();
+            List<Move> possibleMoves = new();
             OnPossibleMovesRequest?.Invoke(board, piece, position, (moves) =>
             {
                 possibleMoves = moves;
@@ -42,15 +42,15 @@ namespace Chess.Logic
 
         internal bool IsMate(Board board, bool whiteTurn)
         {
-            return IsCheckOrStalemate(board, whiteTurn, true);
+            return IsMateOrStalemate(board, whiteTurn, true);
         }
 
         internal bool IsStalemate(Board board, bool whiteTurn)
         {
-            return IsCheckOrStalemate(board, whiteTurn, false);
+            return IsMateOrStalemate(board, whiteTurn, false);
         }
 
-        private bool IsCheckOrStalemate(Board board, bool whiteTurn, bool check)
+        private bool IsMateOrStalemate(Board board, bool whiteTurn, bool check)
         {
             if (IsCheck(board, whiteTurn) != check)
             {
@@ -73,10 +73,10 @@ namespace Chess.Logic
 
         private bool CanMoveWithoutCheck(Board board, Tile tile) 
         {
-            List<PossibleMove> possibleMoves = GetPossibleMoves(board, tile.OccupyingPiece!, tile.Position);
-            foreach (PossibleMove move in possibleMoves)
+            List<Move> possibleMoves = GetPossibleMoves(board, tile.OccupyingPiece!, tile.Position);
+            foreach (Move move in possibleMoves)
             {
-                if (!PotentialCheck(tile.Position, move.vector))
+                if (!PotentialCheck(tile.Position, move.To))
                 {
                     return false;
                 }
@@ -91,7 +91,7 @@ namespace Chess.Logic
 
         private bool Repetition()
         {
-            foreach (var count in boardStateCounts.Values)
+            foreach (var count in _boardStateCounts.Values)
             {
                 if (count >= 3)
                 {
@@ -104,7 +104,7 @@ namespace Chess.Logic
         private bool FiftyMoveRule()
         {
             // 50 turns -> 100 moves
-            return FiftyMoveCounter >= 100;
+            return _fiftyMoveCounter >= 100;
         }
 
         internal bool IsKingUnderAttack(Board board, bool isKingWhite, Vector kingPosition)
@@ -121,10 +121,10 @@ namespace Chess.Logic
 
         private bool CanAttackKing(Board board, Tile tile, Vector kingPosition)
         {
-            List<PossibleMove> possibleMoves = GetPossibleMoves(board, board.GetPieceAt(tile)!, tile.Position);
-            foreach (PossibleMove move in possibleMoves)
+            List<Move> possibleMoves = GetPossibleMoves(board, board.GetPieceAt(tile)!, tile.Position);
+            foreach (Move move in possibleMoves)
             {
-                if (move.vector.IsEqual(kingPosition))
+                if (move.To.IsEqual(kingPosition))
                 {
                     return true;
                 }
@@ -171,13 +171,13 @@ namespace Chess.Logic
         public void SaveBoardState(Board board)
         {
             string boardState = GenerateBoardString(board);
-            if (boardStateCounts.ContainsKey(boardState))
+            if (_boardStateCounts.ContainsKey(boardState))
             {
-                boardStateCounts[boardState]++;
+                _boardStateCounts[boardState]++;
             }
             else
             {
-                boardStateCounts[boardState] = 1;
+                _boardStateCounts[boardState] = 1;
             }
         }
 
