@@ -3,7 +3,7 @@
 ## Project Hierarchy
 
 - [root folder](#classes-in-the-root-folder)
-  - Class for board representation and GUI handling classes.
+  - Classes for tile and board representation and GUI handling classes.
 - [HelperClasses](#helper-classes)
   - Classes that used throughout the project for ease of use.
 - [Logic](#logic)
