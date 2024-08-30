@@ -7,8 +7,8 @@ namespace Chess.Pieces
     internal class Rook : Piece
     {
         private bool Moved;
-        const string sourceWhite = "../../../Resources/w_rook.png";
-        const string sourceBlack = "../../../Resources/b_rook.png";
+        const string sourceWhite = "Resources/w_rook.png";
+        const string sourceBlack = "Resources/b_rook.png";
         public Rook(bool isWhite) : base(PieceType.Rook, isWhite, new RookStrategy(), isWhite ? sourceWhite : sourceBlack)
         {
             Moved = false;

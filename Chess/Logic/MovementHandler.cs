@@ -1,5 +1,6 @@
 ﻿using Chess.HelperClasses;
 using Chess.Pieces;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Chess.Logic
@@ -37,6 +38,12 @@ namespace Chess.Logic
         internal List<Piece> WhiteTakenPieces => _whiteTakenPieces;
         internal List<Piece> BlackTakenPieces => _blackTakenPieces;
         internal int FiftyMoveCounter => _fiftyMoveCounter;
+
+        internal void SortTakenPieces()
+        {
+            _whiteTakenPieces = _whiteTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
+            _blackTakenPieces = _blackTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
+        }
 
         internal bool CanMove(Vector CurrentPosition, Vector NewPosition)
         {
@@ -217,6 +224,14 @@ namespace Chess.Logic
         private void HandlePromotion(Board board, Tile tile)
         {
             bool isWhite = board.GetPieceAt(tile)!.IsWhite;
+            if (isWhite)
+            {
+                _whiteTakenPieces.Add(board.GetPieceAt(tile));
+            }
+            else
+            {
+                _blackTakenPieces.Add(board.GetPieceAt(tile));
+            }
             OnPromotion?.Invoke(isWhite, (pieceType) =>
             {
                 tile.SetEmpty();

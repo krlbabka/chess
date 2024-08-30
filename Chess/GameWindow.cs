@@ -15,7 +15,7 @@ namespace Chess
         private ChessTimer _whiteTimer;
         private ChessTimer _blackTimer;
 
-
+        private bool _isProcessingMove = false;
 
         private readonly Color DarkColor = Color.FromArgb(38, 35, 58);
         private readonly Color LightColor = Color.FromArgb(82, 79, 103);
@@ -64,6 +64,32 @@ namespace Chess
         private void GameWindowClosing()
         {
             Application.Exit();
+        }
+
+        private void SetupTakenPiecesPanels()
+        {
+            _whiteTakenPiecesPanel = new FlowLayoutPanel
+            {
+                FlowDirection = FlowDirection.LeftToRight,
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+                BackColor = DarkColor,
+                Width = Parent.Width,
+                Height = 40,
+                AutoScroll = true
+            };
+            _blackTakenPiecesPanel = new FlowLayoutPanel
+            {
+                FlowDirection = FlowDirection.LeftToRight,
+                AutoSize = true,
+                Dock = DockStyle.Fill,
+                BackColor = DarkColor,
+                Width = Parent.Width,
+                Height = 40,
+                AutoScroll = true
+            };
+            ParentGamePanel.Controls.Add(_whiteTakenPiecesPanel);
+            ParentGamePanel.Controls.Add(_blackTakenPiecesPanel);
         }
 
         private void SetupCoordinateLabels()
@@ -129,9 +155,9 @@ namespace Chess
             UpdateChessboardGUI();
         }
 
-        private void TurnButtonsOff() 
+        private void TurnButtonsOff()
         {
-            foreach (Button button in _boardButtons) 
+            foreach (Button button in _boardButtons!)
             {
                 button.Enabled = false;
             }
@@ -144,10 +170,12 @@ namespace Chess
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
                     Vector position = new Vector(row, col);
-                    Button button = _boardButtons[row, col];
+                    Button button = _boardButtons![row, col];
 
                     button.Click -= ButtonClick;
+                    button.Click -= MoveAction;
                     button.Click -= LegalMoveResetAction;
+
                     if (_board.IsTileOccupied(position))
                     {
                         if (_board.GetPieceAt(position)!.IsWhite == _chessLogic.IsWhiteTurn)
@@ -170,13 +198,13 @@ namespace Chess
 
         private void ButtonClick(object sender, EventArgs e)
         {
-            Button button = (Button)sender;
-            int rowVar = GamePanel.GetRow(button);
-            int colVar = GamePanel.GetColumn(button);
-            _ClickedPosition = new Vector(rowVar, colVar);
-            _chessLogic.FindLegalTiles(_board, _board.BoardGrid[rowVar, colVar], _board.GetPieceAt(_ClickedPosition));
-            UpdateChessboardGUI();
-            UpdateButtonActions();
+                Button button = (Button)sender;
+                int rowVar = GamePanel.GetRow(button);
+                int colVar = GamePanel.GetColumn(button);
+                _ClickedPosition = new Vector(rowVar, colVar);
+                _chessLogic.FindLegalTiles(_board, _board.BoardGrid[rowVar, colVar], _board.GetPieceAt(_ClickedPosition)!);
+                UpdateChessboardGUI();
+                UpdateButtonActions();
         }
 
         private void MoveAction(object sender, EventArgs e)
@@ -202,7 +230,10 @@ namespace Chess
                 for (int col = 0; col < Board.BOARD_SIZE; col++)
                 {
                     Vector position = new(row, col);
-                    Button button = _boardButtons[row, col];
+                    Button button = _boardButtons![row, col];
+                    bool lastMoveCheck = _LastMove != null && position.IsEqual(_LastMove);
+                    bool legalMoveCheck = _board.BoardGrid[position.X, position.Y].LegalMove;
+
                     if (_board.BoardGrid[position.X, position.Y].IsOccupied)
                     {
                         Piece piece = _board.GetPieceAt(position)!;
@@ -212,27 +243,28 @@ namespace Chess
                     {
                         SetPieceImage(button, null);
                     }
-                    if (_LastMove != null && position.IsEqual(_LastMove))
-                    {
-                        SetButtonColor(button, LastMoveColor);
-                        continue;
-                    }
-                    if (_board.BoardGrid[position.X, position.Y].LegalMove)
+                    if (legalMoveCheck)
                     {
                         SetButtonColor(button, LegalMoveColor);
-                        continue;
                     }
-                    Color btnColor = (position.X + position.Y) % 2 == 0 ? LightColor : DarkColor;
-                    SetButtonColor(button, btnColor);
+                    else if (lastMoveCheck)
+                    {
+                        SetButtonColor(button, LastMoveColor);
+                    }
+                    else 
+                    {
+                        Color btnColor = (position.X + position.Y) % 2 == 0 ? LightColor : DarkColor;
+                        SetButtonColor(button, btnColor);
+                    }
                 }
             }
-            
+
             bool check = _chessLogic.IsCheck(_board);
             bool stalemate = _chessLogic.IsStalemate(_board);
             if (check || stalemate)
             {
                 Vector kingPosition = _chessLogic.FindKingPosition(_board);
-                Button button = _boardButtons[kingPosition.X, kingPosition.Y];
+                Button button = _boardButtons![kingPosition.X, kingPosition.Y];
                 SetButtonColor(button, KingInDangerColor);
             }
             UpdateMaterialDifferenceGUI();
@@ -269,12 +301,12 @@ namespace Chess
                     int colVar = col;
                     if (_board.BoardGrid[rowVar, colVar].LegalMove)
                     {
-                        _boardButtons[rowVar, colVar].Click -= ButtonClick;
+                        _boardButtons![rowVar, colVar].Click -= ButtonClick;
                         _boardButtons[rowVar, colVar].Click += MoveAction;
                     }
                     else
                     {
-                        _boardButtons[rowVar, colVar].Click -= MoveAction;
+                        _boardButtons![rowVar, colVar].Click -= MoveAction;
                     }
                 }
             }
@@ -295,14 +327,15 @@ namespace Chess
 
                 string NotationLabel = _chessLogic.GetLastMoveNotation().ToString();
                 DoneMovesTable.Controls.Add(new Label { Text = NotationLabel, ForeColor = Color.White });
-                
+
                 SwitchTurn();
             }
-            Update();
+            GeneralUpdate();
+            UpdateTakenPiecesPanels();
             CheckGameOver();
         }
 
-        private void HandleTimers() 
+        private void HandleTimers()
         {
             if (_chessLogic.IsWhiteTurn)
             {
@@ -325,7 +358,7 @@ namespace Chess
         {
             if (_chessLogic.IsMate(_board, _chessLogic.IsWhiteTurn))
             {
-                DoneMovesTable.Controls[DoneMovesTable.Controls.Count -1].Text += "#";
+                DoneMovesTable.Controls[DoneMovesTable.Controls.Count - 1].Text += "#";
                 TurnButtonsOff();
                 StopTimers();
                 GameOver("Mate");
@@ -341,6 +374,40 @@ namespace Chess
                 TurnButtonsOff();
                 StopTimers();
                 GameOver($"Draw");
+            }
+        }
+
+        private void UpdateTakenPiecesPanels()
+        {
+            _chessLogic.SortTakenPieces();
+            _whiteTakenPiecesPanel.Controls.Clear();
+            foreach (var piece in _chessLogic.WhiteTakenPieces)
+            {
+                PictureBox pieceBox = new PictureBox
+                {
+                    Image = piece.PieceImage,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Width = 30,
+                    Height = 30,
+                    Margin = new Padding(0, 0, 0, 0),
+                    Padding = new Padding(0, 0, 0, 0)
+                };
+                _whiteTakenPiecesPanel.Controls.Add(pieceBox);
+            }
+
+            _blackTakenPiecesPanel.Controls.Clear();
+            foreach (var piece in _chessLogic.BlackTakenPieces)
+            {
+                PictureBox pieceBox = new PictureBox
+                {
+                    Image = piece.PieceImage,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Width = 30,
+                    Height = 30,
+                    Margin = new Padding(0, 0, 0, 0),
+                    Padding = new Padding(0, 0, 0, 0)
+                };
+                _blackTakenPiecesPanel.Controls.Add(pieceBox);
             }
         }
 
@@ -360,14 +427,14 @@ namespace Chess
             }
         }
 
-        private void Update()
+        private void GeneralUpdate()
         {
             UpdateChessboard();
             UpdateChessboardGUI();
             UpdateButtonActions();
         }
 
-        private static void SetPieceImage(Button b, Image pieceImage)
+        private static void SetPieceImage(Button b, Image? pieceImage)
         {
             b.Image = pieceImage;
             b.ImageAlign = ContentAlignment.MiddleCenter;

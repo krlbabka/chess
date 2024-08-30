@@ -121,25 +121,10 @@
   <data name="ParentGamePanel.ColumnCount" type="System.Int32, mscorlib">
     <value>3</value>
   </data>
-  <data name="WhitePlayerMaterial.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="WhitePlayerMaterial.Location" type="System.Drawing.Point, System.Drawing">
-    <value>46, 626</value>
-  </data>
-  <data name="WhitePlayerMaterial.Size" type="System.Drawing.Size, System.Drawing">
-    <value>50, 20</value>
-  </data>
-  <data name="WhitePlayerMaterial.TabIndex" type="System.Int32, mscorlib">
-    <value>4</value>
-  </data>
-  <data name="WhitePlayerMaterial.Text" xml:space="preserve">
-    <value>label2</value>
-  </data>
   <data name="FileLabels.ColumnCount" type="System.Int32, mscorlib">
     <value>8</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="FileLabels.Location" type="System.Drawing.Point, System.Drawing">
     <value>46, 607</value>
   </data>
@@ -148,21 +133,6 @@
   </data>
   <data name="FileLabels.Size" type="System.Drawing.Size, System.Drawing">
     <value>598, 14</value>
-  </data>
-  <data name="BlackPlayerMaterial.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="BlackPlayerMaterial.Location" type="System.Drawing.Point, System.Drawing">
-    <value>46, 0</value>
-  </data>
-  <data name="BlackPlayerMaterial.Size" type="System.Drawing.Size, System.Drawing">
-    <value>43, 20</value>
-  </data>
-  <data name="BlackPlayerMaterial.TabIndex" type="System.Int32, mscorlib">
-    <value>3</value>
-  </data>
-  <data name="BlackPlayerMaterial.Text" xml:space="preserve">
-    <value>Test1</value>
   </data>
   <data name="RankLabels.ColumnCount" type="System.Int32, mscorlib">
     <value>1</value>
@@ -221,6 +191,36 @@
   </data>
   <data name="DoneMovesTable.Size" type="System.Drawing.Size, System.Drawing">
     <value>210, 125</value>
+  </data>
+  <data name="WhitePlayerMaterial.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="WhitePlayerMaterial.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 626</value>
+  </data>
+  <data name="WhitePlayerMaterial.Size" type="System.Drawing.Size, System.Drawing">
+    <value>30, 40</value>
+  </data>
+  <data name="WhitePlayerMaterial.Text" xml:space="preserve">
+    <value>label2</value>
+  </data>
+  <data name="BlackPlayerMaterial.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="BlackPlayerMaterial.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 0</value>
+  </data>
+  <data name="BlackPlayerMaterial.Size" type="System.Drawing.Size, System.Drawing">
+    <value>35, 40</value>
+  </data>
+  <data name="BlackPlayerMaterial.Text" xml:space="preserve">
+    <value>Test1</value>
+  </data>
+  <data name="_blackTakenPiecesPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>598, 34</value>
+  </data>
+  <data name="_whiteTakenPiecesPanel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>598, 41</value>
   </data>
   <data name="ParentGamePanel.Location" type="System.Drawing.Point, System.Drawing">
     <value>35, 12</value>

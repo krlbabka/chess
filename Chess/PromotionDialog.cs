@@ -52,13 +52,13 @@ namespace Chess
             switch (pieceType)
             {
                 case PieceType.Queen:
-                    return Image.FromFile("../../../Resources/" + (!isWhite ? "w_queen.png" : "b_queen.png"));
+                    return Image.FromFile("Resources/" + (!isWhite ? "w_queen.png" : "b_queen.png"));
                 case PieceType.Rook:
-                    return Image.FromFile("../../../Resources/" + (!isWhite ? "w_rook.png" : "b_rook.png"));
+                    return Image.FromFile("Resources/" + (!isWhite ? "w_rook.png" : "b_rook.png"));
                 case PieceType.Bishop:
-                    return Image.FromFile("../../../Resources/" + (!isWhite ? "w_bishop.png" : "b_bishop.png"));
+                    return Image.FromFile("Resources/" + (!isWhite ? "w_bishop.png" : "b_bishop.png"));
                 case PieceType.Knight:
-                    return Image.FromFile("../../../Resources/" + (!isWhite ? "w_knight.png" : "b_knight.png"));
+                    return Image.FromFile("Resources/" + (!isWhite ? "w_knight.png" : "b_knight.png"));
                 default:
                     return null;
             }

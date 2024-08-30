@@ -9,17 +9,14 @@ namespace Chess.Logic
         private GameStateHandler _gameStateHandler;
         private MovementHandler _movementHandler;
         private bool _whiteTurn;
-
         private Move _lastMove;
 
-        private List<Piece> _whiteTakenPieces;
-        private List<Piece> _blackTakenPieces;
 
         public event Action<bool, Action<PieceType>> OnPromotion;
 
         public ChessLogic(Board board)
         {
-            this._board = board;
+            _board = board;
             _movementHandler = new MovementHandler();
             _gameStateHandler = new GameStateHandler();
 
@@ -33,10 +30,11 @@ namespace Chess.Logic
             _gameStateHandler.OnPotentialCheck += PotentialCheckAfterMove;
 
             _whiteTurn = true;
-            _whiteTakenPieces = new List<Piece>();
-            _blackTakenPieces = new List<Piece>();
         }
 
+        internal List<Piece> WhiteTakenPieces => _movementHandler.WhiteTakenPieces;
+        internal List<Piece> BlackTakenPieces => _movementHandler.BlackTakenPieces;
+        internal void SortTakenPieces() => _movementHandler.SortTakenPieces();
         public void setLastMove(Move move) => _lastMove = move;
         internal bool IsWhiteTurn => _whiteTurn;
         internal void SwitchTurn() => _whiteTurn = !_whiteTurn;
@@ -66,11 +64,6 @@ namespace Chess.Logic
             _movementHandler.MovePiece(PotentialBoard, from, to, true);
 
             onSuccess?.Invoke(IsCheck(PotentialBoard));
-        }
-        internal void SortTakenPiecesByValue() 
-        {
-            _whiteTakenPieces = _whiteTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
-            _blackTakenPieces = _blackTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
         }
         internal string GetLastMoveNotation() 
         {

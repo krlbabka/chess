@@ -30,44 +30,38 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameWindow));
             ParentGamePanel = new TableLayoutPanel();
-            WhitePlayerMaterial = new Label();
             FileLabels = new TableLayoutPanel();
-            BlackPlayerMaterial = new Label();
             RankLabels = new TableLayoutPanel();
             GamePanel = new TableLayoutPanel();
             BlackTimerLabel = new Label();
             WhiteTimerLabel = new Label();
             DoneMovesTable = new FlowLayoutPanel();
+            WhitePlayerMaterial = new Label();
+            BlackPlayerMaterial = new Label();
+            _whiteTakenPiecesPanel = new FlowLayoutPanel();
+            _blackTakenPiecesPanel = new FlowLayoutPanel();
             ParentGamePanel.SuspendLayout();
             SuspendLayout();
             // 
             // ParentGamePanel
             // 
             resources.ApplyResources(ParentGamePanel, "ParentGamePanel");
-            ParentGamePanel.Controls.Add(WhitePlayerMaterial, 1, 3);
             ParentGamePanel.Controls.Add(FileLabels, 1, 2);
-            ParentGamePanel.Controls.Add(BlackPlayerMaterial, 1, 0);
             ParentGamePanel.Controls.Add(RankLabels, 0, 1);
             ParentGamePanel.Controls.Add(GamePanel, 1, 1);
             ParentGamePanel.Controls.Add(BlackTimerLabel, 2, 0);
             ParentGamePanel.Controls.Add(WhiteTimerLabel, 2, 3);
             ParentGamePanel.Controls.Add(DoneMovesTable, 2, 1);
+            ParentGamePanel.Controls.Add(WhitePlayerMaterial, 0, 3);
+            ParentGamePanel.Controls.Add(BlackPlayerMaterial, 0, 0);
+            ParentGamePanel.Controls.Add(_blackTakenPiecesPanel, 1, 3);
+            ParentGamePanel.Controls.Add(_whiteTakenPiecesPanel, 1, 0);
             ParentGamePanel.Name = "ParentGamePanel";
-            // 
-            // WhitePlayerMaterial
-            // 
-            resources.ApplyResources(WhitePlayerMaterial, "WhitePlayerMaterial");
-            WhitePlayerMaterial.Name = "WhitePlayerMaterial";
             // 
             // FileLabels
             // 
             resources.ApplyResources(FileLabels, "FileLabels");
             FileLabels.Name = "FileLabels";
-            // 
-            // BlackPlayerMaterial
-            // 
-            resources.ApplyResources(BlackPlayerMaterial, "BlackPlayerMaterial");
-            BlackPlayerMaterial.Name = "BlackPlayerMaterial";
             // 
             // RankLabels
             // 
@@ -96,6 +90,26 @@
             DoneMovesTable.BackColor = Color.FromArgb(38, 35, 58);
             DoneMovesTable.Name = "DoneMovesTable";
             // 
+            // WhitePlayerMaterial
+            // 
+            resources.ApplyResources(WhitePlayerMaterial, "WhitePlayerMaterial");
+            WhitePlayerMaterial.Name = "WhitePlayerMaterial";
+            // 
+            // BlackPlayerMaterial
+            // 
+            resources.ApplyResources(BlackPlayerMaterial, "BlackPlayerMaterial");
+            BlackPlayerMaterial.Name = "BlackPlayerMaterial";
+            // 
+            // _whiteTakenPiecesPanel
+            // 
+            resources.ApplyResources(_whiteTakenPiecesPanel, "_whiteTakenPiecesPanel");
+            _whiteTakenPiecesPanel.Name = "_whiteTakenPiecesPanel";
+            // 
+            // _blackTakenPiecesPanel
+            // 
+            resources.ApplyResources(_blackTakenPiecesPanel, "_blackTakenPiecesPanel");
+            _blackTakenPiecesPanel.Name = "_blackTakenPiecesPanel";
+            // 
             // GameWindow
             // 
             resources.ApplyResources(this, "$this");
@@ -121,5 +135,7 @@
         private Label BlackTimerLabel;
         private Label WhiteTimerLabel;
         private FlowLayoutPanel DoneMovesTable;
+        private FlowLayoutPanel _whiteTakenPiecesPanel;
+        private FlowLayoutPanel _blackTakenPiecesPanel;
     }
 }

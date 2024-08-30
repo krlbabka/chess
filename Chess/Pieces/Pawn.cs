@@ -6,8 +6,8 @@ namespace Chess.Pieces
     internal class Pawn : Piece
     {
         private bool Moved;
-        const string sourceWhite = "../../../Resources/w_pawn.png";
-        const string sourceBlack = "../../../Resources/b_pawn.png";
+        const string sourceWhite = "Resources/w_pawn.png";
+        const string sourceBlack = "Resources/b_pawn.png";
         public Pawn(bool isWhite) : base(PieceType.Pawn, isWhite, new PawnStrategy(), isWhite ? sourceWhite : sourceBlack)
         {
             Moved = false;

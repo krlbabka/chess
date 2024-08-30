@@ -4,8 +4,16 @@ namespace Chess
     {
         static void Main()
         {
-            ApplicationConfiguration.Initialize();
-            Application.Run(new GameWindow());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new GameWindow());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred: {ex.Message}");
+            }
         }
     }
 }
