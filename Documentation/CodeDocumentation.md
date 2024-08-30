@@ -7,7 +7,7 @@
 - [GUI](#gui)
   - GUI handling classes.
 - [HelperClasses](#helper-classes)
-  - Classes that used throughout the project for ease of use.
+  - Classes that are used throughout the project for ease of use.
 - [Logic](#logic)
   - Classes that handle core chess logic.
 - [Pieces](#pieces)

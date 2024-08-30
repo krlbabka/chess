@@ -190,10 +190,18 @@ namespace Chess.Logic
         {
             Vector aboveOrBelowNewTile = board.GetPieceAt(tile)!.IsWhite ? new Vector(1, 0) : new Vector(-1, 0);
             Vector pieceToDeletePosition = tile.Position + aboveOrBelowNewTile;
-            board.BoardGrid[pieceToDeletePosition.X, pieceToDeletePosition.Y].RemoveCurrentPiece();
+            if (board.GetTile(pieceToDeletePosition).OccupyingPiece.IsWhite)
+            {
+                _whiteTakenPieces.Add(board.GetPieceAt(pieceToDeletePosition)!);
+            }
+            else 
+            {
+                _blackTakenPieces.Add(board.GetPieceAt(pieceToDeletePosition)!);
+            }
+            board.GetTile(pieceToDeletePosition).RemoveCurrentPiece();
         }
 
-        private void HandleCastling(Board board, Tile tile) 
+        private void HandleCastling(Board board, Tile tile)
         {
             Piece KingPiece = board.GetPieceAt(tile)!;
             bool isQueenSide = tile.Position.Y == 2;

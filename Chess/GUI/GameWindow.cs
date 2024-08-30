@@ -32,10 +32,16 @@ namespace Chess
             InitializeComponent();
             _board.SetDefaultBoardPosition();
             _whiteTimer = new ChessTimer(5, 0, WhiteTimerLabel);
-            _blackTimer = new ChessTimer(5, 0, BlackTimerLabel);
             _whiteTimer.OnGameOver += () => HandleGameOverDialog("Black wins on time");
+            WhiteTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
+            WhiteTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
+            WhiteTimerLabel.Dock = DockStyle.Fill;
+            _blackTimer = new ChessTimer(5, 0, BlackTimerLabel);
             _blackTimer.OnGameOver += () => HandleGameOverDialog("White wins on time");
             _pieceClicked = new Vector(-1, -1);
+            BlackTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
+            BlackTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
+            BlackTimerLabel.Dock = DockStyle.Fill;
         }
 
         private void GameWindowLoad(object sender, EventArgs e)
@@ -472,9 +478,11 @@ namespace Chess
             _blackTakenPiecesPanel.Controls.Clear();
 
             _LastMove = null;
-            _ClickedPosition = null;
-            _pieceClicked = null;
-
+            _ClickedPosition = new Vector(-1, -1);
+            _pieceClicked = _ClickedPosition;
+            
+            GamePanel.Controls.Clear();
+            SetupChessboard();
             GeneralUpdate();
             SetAllButtonStates(true);
         }
