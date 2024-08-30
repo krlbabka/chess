@@ -1,6 +1,6 @@
 # Chess
 
-A chess implementation made in c# via winforms GUI.
+A chess implementation made in c# using winforms GUI.
 Two person chess game meant to be played on one machine, as there is no online multiplayer support.
 
 ## How to Run
