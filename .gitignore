@@ -5,6 +5,7 @@
 /Chess/obj
 /Chess/.vs
 /Chess/bin
+/Chess/scriptcs_bin/
 
 # VS Code files for those working on multiple tools
 .vscode/*
