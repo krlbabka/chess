@@ -21,3 +21,7 @@ Standard chess rules apply.
 ## Documentation
 
 Documentation can be found in the [User Documentation](Documentation/UserDocumentation.md) or [Code Documentation](Documentation/CodeDocumentation.md).
+
+---
+
+Piece images used were originally made by: Cburnett
