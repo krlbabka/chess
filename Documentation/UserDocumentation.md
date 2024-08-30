@@ -7,7 +7,7 @@ If a game is declared as over for whatever reason (mate, stalemate, draw, time o
 
 ![Game Over Screenshot](../Chess/Resources/screenshots/Game%20Over.png)
 
-Then you can choose if you with to play again, or exit the application.
+Then you can choose if you want to play again, or exit the application.
 
 Other relevant screenshots:
 
