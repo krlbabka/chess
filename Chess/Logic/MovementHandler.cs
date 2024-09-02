@@ -44,6 +44,9 @@ namespace Chess.Logic
             _blackTakenPieces = _blackTakenPieces.OrderByDescending(piece => piece.MaterialValue).ToList();
         }
 
+        /// <summary>
+        /// Calls the ChessLogic's PotentialCheckAfterMove method.
+        /// </summary>
         internal bool CanMove(Vector CurrentPosition, Vector NewPosition)
         {
             bool check = false;
@@ -54,17 +57,25 @@ namespace Chess.Logic
             return check;
         }
 
+        /// <summary>
+        /// Moves the piece from starting Tile to the ending Tile, handles taking pieces.
+        /// </summary>
         internal void MovePiece(Board board, Vector currentPosition, Vector newPosition, bool simulatingMove = false)
         {
             Tile CurrentTile = board.BoardGrid[currentPosition.X, currentPosition.Y];
             Tile NewTile = board.BoardGrid[newPosition.X, newPosition.Y];
+
+            // No piece.
             if (board.GetPieceAt(CurrentTile) == null)
             {
                 return;
             }
+
             Piece CurrentPiece = board.GetPieceAt(CurrentTile)!;
             bool isCapture = board.IsTileOccupied(NewTile);
             bool enPassantCapture = NewTile.MoveType == MoveType.EnPassant;
+
+            // Update the piece that is to be taken.
             Piece? capturedPiece = null;
             if (isCapture)
             {
@@ -76,9 +87,11 @@ namespace Chess.Logic
 
             }
 
+            // Updating values for the board.
             HandleTakenPieces(simulatingMove, isCapture, NewTile.OccupyingPiece!);
             UpdateTilesOnMove(CurrentTile, NewTile);
 
+            // Handle the rest of the updates.
             if (!simulatingMove)
             {
                 bool PawnMove = CurrentPiece.Type == PieceType.Pawn;
@@ -87,6 +100,7 @@ namespace Chess.Logic
 
                 UpdateDrawVariables(isCapture, PawnMove);
 
+                // Saves the current board state.
                 OnBoardSaved?.Invoke(board);
 
                 if (PawnMove || KingMove || RookMove)
@@ -100,6 +114,9 @@ namespace Chess.Logic
             }
         }
 
+        /// <summary>
+        /// Checks the piece value and updates the current difference between players.
+        /// </summary>
         private void UpdateMaterialDifference(bool isCapture, Tile tile, Piece? capturedPiece)
         {
             if (isCapture)
@@ -132,6 +149,9 @@ namespace Chess.Logic
             }
         }
 
+        /// <summary>
+        /// Updates the variables that are checked for a draw.
+        /// </summary>
         private void UpdateDrawVariables(bool capture, bool PawnMove)
         {
             if (capture || PawnMove)
@@ -145,6 +165,9 @@ namespace Chess.Logic
             }
         }
 
+        /// <summary>
+        /// Adds the move to a list of moves and sets the last move.
+        /// </summary>
         private void UpdateMoves(Move move, bool isCapture, Tile tile)
         {
             _moves.Add(move);
@@ -154,6 +177,9 @@ namespace Chess.Logic
             OnLastMoveChange?.Invoke(move);
         }
 
+        /// <summary>
+        /// Updates the lists of taken pieces.
+        /// </summary>
         private void HandleTakenPieces(bool simulation, bool isCapture, Piece piece)
         {
             if (simulation || !isCapture || piece!.IsPromotedPawn)
@@ -170,6 +196,9 @@ namespace Chess.Logic
             }
         }
 
+        /// <summary>
+        /// Helper method for calling respective special move methods. 
+        /// </summary>
         private void HandleSpecialMoveTypes(Board board, Tile newTile)
         {
             if (newTile.MoveType == MoveType.EnPassant)
@@ -186,6 +215,9 @@ namespace Chess.Logic
             }
         }
 
+        /// <summary>
+        /// Updates the board as per enPassant move.
+        /// </summary>
         private void HandleEnPassant(Board board, Tile tile) 
         {
             Vector aboveOrBelowNewTile = board.GetPieceAt(tile)!.IsWhite ? new Vector(1, 0) : new Vector(-1, 0);
@@ -201,6 +233,9 @@ namespace Chess.Logic
             board.GetTile(pieceToDeletePosition).RemoveCurrentPiece();
         }
 
+        /// <summary>
+        /// Updates the board as per castling move.
+        /// </summary>
         private void HandleCastling(Board board, Tile tile)
         {
             Piece KingPiece = board.GetPieceAt(tile)!;
@@ -209,16 +244,17 @@ namespace Chess.Logic
 
             if (isQueenSide)
             {
-                // Queen side the rook moves by three to the right
+                // Queen side the rook moves by three to the right.
                 HandleCastlingRookMovement(board, KingPiece.IsWhite, 0, 3);
             }
             else if (isKingSide)
             {
-                // King side the rook moves by two to the left
+                // King side the rook moves by two to the left.
                 HandleCastlingRookMovement(board, KingPiece.IsWhite, 7, 5);
             }
         }
 
+        // Helper method to move the rook
         private void HandleCastlingRookMovement(Board board, bool isWhite, int OriginalFile, int TargetFile) 
         {
             int Rank = isWhite ? 7 : 0;
@@ -228,6 +264,9 @@ namespace Chess.Logic
             UpdateTilesOnMove(rookTile, rookTileTarget);
         }
 
+        /// <summary>
+        /// Updates the promoting piece.
+        /// </summary>
         private void HandlePromotion(Board board, Tile tile)
         {
             bool isWhite = board.GetPieceAt(tile)!.IsWhite;
@@ -247,6 +286,9 @@ namespace Chess.Logic
             });
         }
 
+        /// <summary>
+        /// Finds all possible moves for given tile & piece and updates board so that all legal Tiles are marked as such.
+        /// </summary>
         internal void FindLegalTiles(Board board, Tile CurrentTile, Piece ChessPiece)
         {
             board.ResetLegalMoves();
@@ -256,7 +298,7 @@ namespace Chess.Logic
             {
                 if (possibleMove.moveType == MoveType.Castling)
                 {
-                    if (PotentialCastleCheck(board, position, possibleMove.To, ChessPiece))
+                    if (PotentialCastleCheck(board, position, possibleMove.To))
                     {
                         continue;
                     }
@@ -276,6 +318,7 @@ namespace Chess.Logic
             }
         }
 
+        // Helper method with checks for a tile.
         private bool TileNotValid(Board board, Vector position, Vector tileVector)
         {
             bool OccupiedByAlliedPiece = board.IsTileOccupied(tileVector) && !board.AreEnemies(position, tileVector);
@@ -285,7 +328,10 @@ namespace Chess.Logic
             return false;
         }
 
-        private bool PotentialCastleCheck(Board board, Vector from, Vector to, Piece piece)
+        /// <summary>
+        /// Checks if the king is trying to castle from a check or trying to go through a check during castling.
+        /// </summary>
+        private bool PotentialCastleCheck(Board board, Vector from, Vector to)
         {
             bool check = false;
             OnCheck?.Invoke(board, (isCheck) =>
@@ -302,6 +348,9 @@ namespace Chess.Logic
             return false;
         }
 
+        /// <summary>
+        /// Iterates over all tiles and looks if the current piece can move there.
+        /// </summary>
         internal List<Move> GetPossibleMoves(Board board, Piece piece, Vector currentPosition)
         {
             List<Move> possibleMoves = new List<Move>();
@@ -323,11 +372,15 @@ namespace Chess.Logic
             return possibleMoves;
         }
 
+        // Method override calling the original method for access from ChessLogic class.
         internal void GetPossibleMoves(Board board, Piece piece, Vector position, Action<List<Move>> possibleMoves) 
         {
             possibleMoves?.Invoke(GetPossibleMoves(board, piece, position));
         }
 
+        /// <summary>
+        /// Adds the piece to the new Tile and removes it from the old one, sets corresponding Tile values.
+        /// </summary>
         private void UpdateTilesOnMove(Tile from, Tile to) 
         {
             to.SetNewPiece(from.OccupyingPiece!);

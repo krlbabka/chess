@@ -7,7 +7,6 @@ namespace Chess
 {
     public partial class GameWindow : Form
     {
-
         private Button[,]? _boardButtons;
         private Board _board;
         private ChessLogic _chessLogic;
@@ -16,6 +15,7 @@ namespace Chess
         private ChessTimer _whiteTimer;
         private ChessTimer _blackTimer;
 
+        // Colors used
         private readonly Color DarkColor = Color.FromArgb(38, 35, 58);
         private readonly Color LightColor = Color.FromArgb(82, 79, 103);
         private readonly Color LastMoveColor = Color.FromArgb(196, 167, 231);
@@ -60,21 +60,8 @@ namespace Chess
             SetupCoordinateLabels();
             SetupTakenPiecesPanels();
             UpdateChessboard();
-
-
-            WhiteTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
-            WhiteTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
-            WhiteTimerLabel.Dock = DockStyle.Fill;
-
-            BlackTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
-            BlackTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
-            BlackTimerLabel.Dock = DockStyle.Fill;
-
-            WhitePlayerMaterial.Font = new Font("Verdana", 20);
-            WhitePlayerMaterial.Dock = DockStyle.Fill;
-            BlackPlayerMaterial.Font = new Font("Verdana", 20);
-            BlackPlayerMaterial.Dock = DockStyle.Fill;
-
+            SetupTimers();
+            SetupMaterialLabels();
             FormClosing += (sender, e) => GameWindowClosing();
         }
 
@@ -142,6 +129,25 @@ namespace Chess
             }
         }
 
+        private void SetupTimers()
+        {
+            WhiteTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
+            WhiteTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
+            WhiteTimerLabel.Dock = DockStyle.Fill;
+
+            BlackTimerLabel.Font = new Font("Verdana", 20, FontStyle.Bold);
+            BlackTimerLabel.TextAlign = ContentAlignment.MiddleCenter;
+            BlackTimerLabel.Dock = DockStyle.Fill;
+        }
+
+        private void SetupMaterialLabels()
+        {
+            WhitePlayerMaterial.Font = new Font("Verdana", 20);
+            WhitePlayerMaterial.Dock = DockStyle.Fill;
+            BlackPlayerMaterial.Font = new Font("Verdana", 20);
+            BlackPlayerMaterial.Dock = DockStyle.Fill;
+        }
+
         private void SetupChessboard()
         {
             _boardButtons = new Button[Board.BOARD_SIZE, Board.BOARD_SIZE];
@@ -164,6 +170,9 @@ namespace Chess
             UpdateChessboardGUI();
         }
 
+        /// <summary>
+        /// Sets all buttons enabled property to the parameter.
+        /// </summary>
         private void SetAllButtonStates(bool value)
         {
             foreach (Button button in _boardButtons!)
@@ -172,6 +181,9 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Iterates over all buttons to update their state.
+        /// </summary>
         private void UpdateChessboard()
         {
             for (int row = 0; row < Board.BOARD_SIZE; row++)
@@ -186,6 +198,9 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Button state handler for UpdateChessboard method.
+        /// </summary>
         private void UpdateButtonActions(Vector position, Button button)
         {
             button.Click -= ValidTileClick;
@@ -217,6 +232,9 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Event for a piece click.
+        /// </summary>
         private void ValidTileClick(object sender, EventArgs e)
         {
             Button button = (Button)sender;
@@ -232,6 +250,9 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Event for a click on legal tile for a piece to move to.
+        /// </summary>
         private void MoveAction(object sender, EventArgs e)
         {
             Button button = (Button)sender;
@@ -242,6 +263,9 @@ namespace Chess
             _pieceClicked = _ClickedPosition;
         }
 
+        /// <summary>
+        /// Event that resets current valid moves.
+        /// </summary>
         private void LegalMoveResetAction(object? sender, EventArgs e)
         {
             _board.ResetLegalMoves();
@@ -250,6 +274,9 @@ namespace Chess
             _pieceClicked = _ClickedPosition;
         }
 
+        /// <summary>
+        /// Iterates over the UI button grid and updates the values.
+        /// </summary>
         private void UpdateChessboardGUI()
         {
             for (int row = 0; row < Board.BOARD_SIZE; row++)
@@ -297,6 +324,9 @@ namespace Chess
             UpdateMaterialDifferenceGUI();
         }
 
+        /// <summary>
+        /// Updates the labels that display the difference in material.
+        /// </summary>
         private void UpdateMaterialDifferenceGUI()
         {
             int materialDiff = _chessLogic.GetMaterialDifference();
@@ -324,6 +354,9 @@ namespace Chess
             HandleTimers();
         }
 
+        /// <summary>
+        /// Moves the piece from the starting position to the new position.
+        /// </summary>
         private void MovePiece(Vector Current, Vector New)
         {
             if (_chessLogic.CanMove(Current, New))
@@ -341,6 +374,9 @@ namespace Chess
             CheckGameOver();
         }
 
+        /// <summary>
+        /// Starts the timer on the corresponding turn start and pauses it on the turn end.
+        /// </summary>
         private void HandleTimers()
         {
             if (_chessLogic.IsWhiteTurn)
@@ -361,6 +397,9 @@ namespace Chess
             _blackTimer.Stop();
         }
 
+        /// <summary>
+        /// Check all possible game over variants and calls the Game Over dialog if any are met.
+        /// </summary>
         private void CheckGameOver()
         {
             if (_chessLogic.IsMate(_board, _chessLogic.IsWhiteTurn))
@@ -384,6 +423,9 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Updates the gui part above/below the chessboard that displays taken pieces.
+        /// </summary>
         private void UpdateTakenPiecesPanels()
         {
             _chessLogic.SortTakenPieces();
@@ -418,6 +460,9 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Calls the promotion pop up form.
+        /// </summary>
         private void HandlePromotionDialog(bool isWhite, Action<PieceType> onActionSuccess)
         {
             using (PromotionDialog dialog = new PromotionDialog(isWhite, this))
@@ -434,6 +479,9 @@ namespace Chess
             }
         }
 
+        /// <summary>
+        /// Calls Chessboard updates.
+        /// </summary>
         private void GeneralUpdate()
         {
             UpdateChessboard();
@@ -453,6 +501,9 @@ namespace Chess
             b.FlatAppearance.MouseOverBackColor = color;
         }
 
+        /// <summary>
+        /// Calls the Game Over pop up form.
+        /// </summary>
         private void HandleGameOverDialog(string message)
         {
             using (GameOverDialog dialog = new GameOverDialog(message))

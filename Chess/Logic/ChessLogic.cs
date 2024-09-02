@@ -36,7 +36,7 @@ namespace Chess.Logic
         internal bool IsWhiteTurn => _whiteTurn;
         internal void SwitchTurn() => _whiteTurn = !_whiteTurn;
 
-        // Movement Handler Classes
+        // Movement Methods
         internal List<Piece> WhiteTakenPieces => _movementHandler.WhiteTakenPieces;
         internal List<Piece> BlackTakenPieces => _movementHandler.BlackTakenPieces;
         internal void SortTakenPieces() => _movementHandler.SortTakenPieces();
@@ -46,13 +46,17 @@ namespace Chess.Logic
         internal int GetMaterialDifference() => _movementHandler.MaterialDifference;
         internal void HandlePromotion(bool isWhite, Action<PieceType> type) => OnPromotion?.Invoke(isWhite, type);
 
-
+        // Game State Methods
         internal Vector FindKingPosition(Board board) => _gameStateHandler.FindKingPosition(board, _whiteTurn);
         internal bool IsCheck(Board board) => _gameStateHandler.IsCheck(board, _whiteTurn);
         internal void IsCheck(Board board, Action<bool> onSuccess) => onSuccess?.Invoke(_gameStateHandler.IsCheck(board, _whiteTurn));
         internal bool IsMate(Board board, bool whiteTurn) => _gameStateHandler.IsMate(board, whiteTurn);
         internal bool IsStalemate(Board board) => _gameStateHandler.IsStalemate(board, _whiteTurn);
         internal bool IsDraw() => _gameStateHandler.IsDraw(_board);
+
+        /// <summary>
+        /// Simulates a move and check for check on said move.
+        /// </summary>
         internal void PotentialCheckAfterMove(Vector from, Vector to, Action<bool> onSuccess)
         {
             Board PotentialBoard = new()
@@ -69,7 +73,11 @@ namespace Chess.Logic
 
             onSuccess?.Invoke(IsCheck(PotentialBoard));
         }
-        internal string GetLastMoveNotation() 
+
+        /// <summary>
+        /// Builds a string in algebraic notation for the last move done.
+        /// </summary>
+        internal string GetLastMoveNotation()
         {
             if (_lastMove == null)
             {

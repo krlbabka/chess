@@ -14,6 +14,9 @@ namespace Chess.Logic
         private Dictionary<string, int> _boardStateCounts = new();
         private int _fiftyMoveCounter;
 
+        /// <summary>
+        /// Calls the MovementHandler's GetPossibleMoves method.
+        /// </summary>
         private List<Move> GetPossibleMoves(Board board, Piece piece, Vector position)
         {
             List<Move> possibleMoves = new();
@@ -24,6 +27,9 @@ namespace Chess.Logic
             return possibleMoves;
         }
 
+        /// <summary>
+        /// Calls the ChessLogic's PotentialCheckAfterMove method.
+        /// </summary>
         private bool PotentialCheck(Vector from, Vector to) 
         {
             bool check = false;
@@ -50,6 +56,9 @@ namespace Chess.Logic
             return IsMateOrStalemate(board, whiteTurn, false);
         }
 
+        /// <summary>
+        /// Shared logic for mate and stalemate, i.e. look for any possible move.
+        /// </summary>
         private bool IsMateOrStalemate(Board board, bool whiteTurn, bool check)
         {
             if (IsCheck(board, whiteTurn) != check)
@@ -59,6 +68,9 @@ namespace Chess.Logic
             return NoMoveLeft(board, whiteTurn);
         }
 
+        /// <summary>
+        /// Iterates over all pieces and checks for moves.
+        /// </summary>
         private bool NoMoveLeft(Board board, bool whiteTurn)
         {
             foreach (Tile tile in board.BoardGrid)
@@ -71,7 +83,10 @@ namespace Chess.Logic
             return true;
         }
 
-        private bool CanMoveWithoutCheck(Board board, Tile tile) 
+        /// <summary>
+        /// Checks if there is a possible move for the piece on a given tile.
+        /// </summary>
+        private bool CanMoveWithoutCheck(Board board, Tile tile)
         {
             List<Move> possibleMoves = GetPossibleMoves(board, tile.OccupyingPiece!, tile.Position);
             foreach (Move move in possibleMoves)
@@ -89,6 +104,9 @@ namespace Chess.Logic
             return Repetition() || FiftyMoveRule() || IsInsufficientMaterial(board);
         }
 
+        /// <summary>
+        /// Checks for repeating board states.
+        /// </summary>
         private bool Repetition()
         {
             foreach (var count in _boardStateCounts.Values)
@@ -107,6 +125,9 @@ namespace Chess.Logic
             return _fiftyMoveCounter >= 100;
         }
 
+        /// <summary>
+        /// Iterates over enemy pieces and checks if any piece is threatening the king. 
+        /// </summary>
         internal bool IsKingUnderAttack(Board board, bool isKingWhite, Vector kingPosition)
         {
             foreach (Tile tile in board.BoardGrid)
@@ -119,6 +140,9 @@ namespace Chess.Logic
             return false;
         }
 
+        /// <summary>
+        /// Checks if the piece on a given tile is threatening the king. 
+        /// </summary>
         private bool CanAttackKing(Board board, Tile tile, Vector kingPosition)
         {
             List<Move> possibleMoves = GetPossibleMoves(board, board.GetPieceAt(tile)!, tile.Position);
@@ -132,6 +156,9 @@ namespace Chess.Logic
             return false;
         }
 
+        /// <summary>
+        /// Finds and returns the position of the king with given color as a Vector.
+        /// </summary>
         internal Vector FindKingPosition(Board board, bool isKingWhite)
         {
             foreach (Tile tile in board.BoardGrid)
@@ -145,6 +172,9 @@ namespace Chess.Logic
             throw new InvalidOperationException("King not found on the board.");
         }
 
+        /// <summary>
+        /// Iterates over the chessboard and makes a string representation.
+        /// </summary>
         private string GenerateBoardString(Board board)
         {
             StringBuilder sb = new StringBuilder();
@@ -168,6 +198,9 @@ namespace Chess.Logic
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Saves the current board state into a dictionary of board states.
+        /// </summary>
         public void SaveBoardState(Board board)
         {
             string boardState = GenerateBoardString(board);
@@ -181,6 +214,9 @@ namespace Chess.Logic
             }
         }
 
+        /// <summary>
+        /// Checks if there are not enough pieces to achieve a checkmate.
+        /// </summary>
         internal bool IsInsufficientMaterial(Board board)
         {
             string boardString = GenerateBoardString(board);
@@ -212,7 +248,8 @@ namespace Chess.Logic
                 return true;
             }
 
-            // King & Bishop    ||    King & Bishop    -    Stricter Chess.com rules to not worry about the tile color bishops are using
+            // King & Bishop    ||    King & Bishop
+            // Stricter Chess.com rules to not worry about the tile color bishops are using.
             if (InsufficiencyBase && whiteBishopCount == 1 && blackBishopCount == 1)
             {
                 return true;
