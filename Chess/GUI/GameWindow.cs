@@ -20,6 +20,7 @@ namespace Chess
         private readonly Color LightColor = Color.FromArgb(82, 79, 103);
         private readonly Color LastMoveColor = Color.FromArgb(196, 167, 231);
         private readonly Color LegalMoveColor = Color.FromArgb(156, 207, 216);
+        private readonly Color SelectedPieceColor = Color.FromArgb(86, 148, 159);
         private readonly Color KingInDangerColor = Color.FromArgb(235, 111, 146);
 
         private Vector _pieceClicked;
@@ -31,10 +32,14 @@ namespace Chess
             _chessLogic.OnPromotion += HandlePromotionDialog;
             InitializeComponent();
             _board.SetDefaultBoardPosition();
+
+            WhiteTimerLabel.BackColor = SelectedPieceColor;
             _whiteTimer = new ChessTimer(5, 0, WhiteTimerLabel);
             _whiteTimer.OnGameOver += () => HandleGameOverDialog("Black wins on time");
+
             _blackTimer = new ChessTimer(5, 0, BlackTimerLabel);
             _blackTimer.OnGameOver += () => HandleGameOverDialog("White wins on time");
+
             _pieceClicked = new Vector(-1, -1);
         }
 
@@ -46,12 +51,12 @@ namespace Chess
             DoneMovesTable.AutoScroll = true;
             DoneMovesTable.BackColor = DarkColor;
 
-            Size = new Size(920, 720);
+            Size = new Size(920, 760);
             ParentGamePanel.Controls.Add(GamePanel);
             ParentGamePanel.Dock = DockStyle.None;
             ParentGamePanel.Top = 35;
             ParentGamePanel.Left = 35;
-            ParentGamePanel.Size = new Size(740, 620);
+            ParentGamePanel.Size = new Size(740, 640);
 
             GamePanel.Dock = DockStyle.Fill;
             GamePanel.Size = new Size(600, 600);
@@ -142,10 +147,8 @@ namespace Chess
 
         private void SetupMaterialLabels()
         {
-            WhitePlayerMaterial.Font = new Font("Verdana", 20);
-            WhitePlayerMaterial.Dock = DockStyle.Fill;
-            BlackPlayerMaterial.Font = new Font("Verdana", 20);
-            BlackPlayerMaterial.Dock = DockStyle.Fill;
+            WhitePlayerMaterial.Font = new Font("Verdana", 12);
+            BlackPlayerMaterial.Font = new Font("Verdana", 12);
         }
 
         private void SetupChessboard()
@@ -244,9 +247,9 @@ namespace Chess
             {
                 _ClickedPosition = new Vector(rowVar, colVar);
                 _chessLogic.FindLegalTiles(_board, _board.BoardGrid[rowVar, colVar], _board.GetPieceAt(_ClickedPosition)!);
+                _pieceClicked = _ClickedPosition;
                 UpdateChessboard();
                 UpdateChessboardGUI();
-                _pieceClicked = _ClickedPosition;
             }
         }
 
@@ -260,7 +263,7 @@ namespace Chess
             int colVar = GamePanel.GetColumn(button);
 
             MovePiece(_ClickedPosition!, _board.BoardGrid[rowVar, colVar].Position);
-            _pieceClicked = _ClickedPosition;
+            _pieceClicked = new Vector(-1, -1);
         }
 
         /// <summary>
@@ -269,9 +272,9 @@ namespace Chess
         private void LegalMoveResetAction(object? sender, EventArgs e)
         {
             _board.ResetLegalMoves();
+            _pieceClicked = new Vector(-1, -1);
             UpdateChessboard();
             UpdateChessboardGUI();
-            _pieceClicked = _ClickedPosition;
         }
 
         /// <summary>
@@ -287,6 +290,7 @@ namespace Chess
                     Button button = _boardButtons![row, col];
                     bool lastMoveCheck = _LastMove != null && position.IsEqual(_LastMove);
                     bool legalMoveCheck = _board.BoardGrid[position.X, position.Y].LegalMove;
+                    bool currentPieceSelected = position.IsEqual(_pieceClicked);
 
                     if (_board.BoardGrid[position.X, position.Y].IsOccupied)
                     {
@@ -304,6 +308,10 @@ namespace Chess
                     else if (lastMoveCheck)
                     {
                         SetButtonColor(button, LastMoveColor);
+                    }
+                    else if (currentPieceSelected)
+                    {
+                        SetButtonColor(button, SelectedPieceColor);
                     }
                     else 
                     {
@@ -334,7 +342,6 @@ namespace Chess
             {
                 BlackPlayerMaterial.Text = materialDiff.ToString();
                 WhitePlayerMaterial.Text = " ";
-
             }
             else if (materialDiff < 0)
             {
@@ -383,11 +390,17 @@ namespace Chess
             {
                 _blackTimer.Stop();
                 _whiteTimer.Start();
+
+                WhiteTimerLabel.BackColor = SelectedPieceColor;
+                BlackTimerLabel.BackColor = Color.Transparent;
             }
             else
             {
                 _whiteTimer.Stop();
                 _blackTimer.Start();
+
+                BlackTimerLabel.BackColor = SelectedPieceColor;
+                WhiteTimerLabel.BackColor = Color.Transparent;
             }
         }
 

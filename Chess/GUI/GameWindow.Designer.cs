@@ -50,13 +50,15 @@
             ParentGamePanel.Controls.Add(RankLabels, 0, 1);
             ParentGamePanel.Controls.Add(GamePanel, 1, 1);
             ParentGamePanel.Controls.Add(BlackTimerLabel, 2, 0);
-            ParentGamePanel.Controls.Add(WhiteTimerLabel, 2, 3);
+            ParentGamePanel.Controls.Add(WhiteTimerLabel, 2, 2);
             ParentGamePanel.Controls.Add(DoneMovesTable, 2, 1);
             ParentGamePanel.Controls.Add(WhitePlayerMaterial, 0, 3);
             ParentGamePanel.Controls.Add(BlackPlayerMaterial, 0, 0);
             ParentGamePanel.Controls.Add(_blackTakenPiecesPanel, 1, 3);
             ParentGamePanel.Controls.Add(_whiteTakenPiecesPanel, 0, 0);
             ParentGamePanel.Name = "ParentGamePanel";
+
+            ParentGamePanel.SetRowSpan(WhiteTimerLabel, 2);
             // 
             // FileLabels
             // 
